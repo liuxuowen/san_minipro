@@ -1,0 +1,39 @@
+# General
+.DS_Store
+*.log
+test_data/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Flask
+instance/
+.webassets-cache
+.env
+san_minipro.db
+
+# WeChat Mini Program
+minipro/node_modules/
+minipro/miniprogram_npm/
+minipro/project.private.config.json
+
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Security
+*.pem
+*.key
