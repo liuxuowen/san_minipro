@@ -1,0 +1,47 @@
+<view class="container">
+  <view class="nav-bar">
+    <view class="breadcrumb" bindtap="goBack">
+      <text class="back-icon">❮</text>
+      <text class="back-text">返回我的数据</text>
+    </view>
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">
+    <text>正在分析数据...</text>
+  </view>
+
+  <view class="content" wx:else>
+    <!-- Combined Card: Header + Group Selector -->
+    <view class="info-card">
+      <view class="header-section">
+        <view class="title">{{title}}</view>
+        <view class="subtitle">{{early_ts}} -> {{late_ts}}</view>
+      </view>
+      
+      <view class="divider"></view>
+
+      <view class="group-selector">
+        <block wx:for="{{groups}}" wx:key="*this">
+          <view class="group-tab {{currentGroup === item ? 'active' : ''}}" bindtap="selectGroup" data-group="{{item}}">
+            {{item}}
+          </view>
+        </block>
+      </view>
+    </view>
+
+    <!-- Main Image Display -->
+    <view class="image-container" wx:if="{{currentImage}}">
+      <image 
+        class="main-image" 
+        src="{{currentImage}}" 
+        mode="widthFix" 
+        bindtap="previewImage" 
+        show-menu-by-longpress="true"
+      ></image>
+      <view class="hint">点击图片预览，长按可保存/转发</view>
+    </view>
+    <view class="no-data" wx:else>
+      <text>暂无图片数据</text>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,114 @@
+.container {
+  padding: 20rpx;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-bar {
+  padding: 20rpx 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  font-size: 28rpx;
+  color: #576b95;
+  padding: 10rpx;
+}
+
+.back-icon {
+  margin-right: 8rpx;
+  font-size: 24rpx;
+  font-weight: bold;
+}
+
+.back-text {
+  font-weight: 500;
+}
+
+.info-card {
+  background: #fff;
+  border-radius: 12rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.05);
+}
+
+.header-section {
+  text-align: center;
+  margin-bottom: 20rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.subtitle {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.divider {
+  height: 1rpx;
+  background: #eee;
+  margin: 20rpx 0;
+}
+
+.group-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20rpx;
+  justify-content: center;
+}
+
+.group-tab {
+  display: inline-block;
+  padding: 12rpx 34rpx;
+  background: #f5f5f5;
+  border-radius: 32rpx;
+  font-size: 26rpx;
+  color: #666;
+  transition: all 0.3s ease;
+}
+
+.group-tab.active {
+  background: #333;
+  color: #fff;
+  font-weight: bold;
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.2);
+}
+
+.image-container {
+  background: transparent;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.main-image {
+  width: 600rpx;
+  border-radius: 8rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.1);
+}
+
+.hint {
+  margin-top: 20rpx;
+  font-size: 24rpx;
+  color: #999;
+}
+
+.no-data {
+  text-align: center;
+  padding: 50rpx;
+  color: #999;
+}

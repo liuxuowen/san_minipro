@@ -1,0 +1,117 @@
+page {
+  background: #fafafa;
+  padding-bottom: 40rpx;
+}
+
+.container {
+  padding: 20rpx;
+  box-sizing: border-box;
+}
+
+.card {
+  background: #fff;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  box-shadow: 0 6rpx 18rpx rgba(0,0,0,0.08);
+  margin-bottom: 32rpx;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+}
+
+.desc {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 30rpx;
+  line-height: 1.5;
+}
+
+.upload-btn {
+  background: #07c160;
+  color: #fff;
+  font-size: 32rpx;
+  border-radius: 16rpx;
+  margin-top: 20rpx;
+}
+
+.note {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 20rpx;
+}
+
+.section-header {
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+}
+
+.analysis-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+}
+
+.analysis-btn {
+  flex: 1;
+  font-size: 26rpx;
+  padding: 10rpx 0;
+  background: #07c160;
+  color: #fff;
+  border-radius: 10rpx;
+  text-align: center;
+  line-height: 2;
+}
+
+.analysis-btn.is-disabled {
+  background: #f1f1f1;
+  color: #8c8c8c;
+}
+
+.uploads-list {
+  margin-top: 10rpx;
+}
+
+.upload-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 10rpx;
+  border-bottom: 1rpx solid #eee;
+  font-size: 28rpx;
+}
+
+.upload-item.is-selected {
+  background: rgba(7,193,96,0.05);
+  border-radius: 10rpx;
+}
+
+.upload-item.is-selected .upload-text {
+  color: #075c34;
+  font-weight: bold;
+}
+
+.upload-info {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0; /* 防止长文本撑开容器 */
+}
+
+.delete-btn {
+  font-size: 24rpx;
+  color: #c0392b;
+  border: 1rpx solid #e5e5e5;
+  padding: 4rpx 16rpx;
+  border-radius: 8rpx;
+  margin-left: 20rpx;
+}

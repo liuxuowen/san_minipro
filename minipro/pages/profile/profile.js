@@ -1,5 +1,5 @@
 const app = getApp()
-const defaultAvatarUrl = 'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwBHJrRn51zByDJ9Q6uy9yH5DG5bV4owSEje0fdHuyQ875e5K8tR4o6J8_HDD0dAcECy4g3w3rPwsg/0'
+const defaultAvatarUrl = '/static/icons/default.png'
 
 Page({
   data: {

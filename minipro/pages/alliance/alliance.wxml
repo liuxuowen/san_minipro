@@ -1,3 +1,33 @@
 <view class="container">
-  <text>{{text}}</text>
+  <view class="card">
+    <view class="title">上传同盟统计数据</view>
+    <view class="desc">上传最新同盟统计，系统会保存成员数据用于后续分析，一个账号只支持一个同盟。</view>
+    <button class="upload-btn" bindtap="chooseFile">选择文件 (CSV)</button>
+    <view class="note">文件名需包含导出时间（示例：同盟统计2025年01月25日13时30分12秒.csv）。</view>
+  </view>
+
+  <view class="card" wx:if="{{uploads.length > 0}}">
+    <view class="section-header">
+      <text class="section-title">我的数据</text>
+    </view>
+    
+    <view class="analysis-actions">
+      <button class="analysis-btn {{canCompare ? '' : 'is-disabled'}}" bindtap="onAnalyze" data-type="battle">战功</button>
+      <button class="analysis-btn {{canCompare ? '' : 'is-disabled'}}" bindtap="onAnalyze" data-type="power">势力</button>
+      <button class="analysis-btn {{canCompare ? '' : 'is-disabled'}}" bindtap="onAnalyze" data-type="contrib">贡献</button>
+      <button class="analysis-btn {{canCompare ? '' : 'is-disabled'}}" bindtap="onAnalyze" data-type="assist">助攻</button>
+      <button class="analysis-btn {{canCompare ? '' : 'is-disabled'}}" bindtap="onAnalyze" data-type="donation">捐献</button>
+    </view>
+
+    <view class="uploads-list">
+      <block wx:for="{{uploads}}" wx:key="id">
+        <view class="upload-item {{item.selected ? 'is-selected' : ''}}" bindtap="toggleSelection" data-id="{{item.id}}">
+          <view class="upload-info">
+            <text class="upload-text">{{item.ts}} (成员数: {{item.member_count}})</text>
+          </view>
+          <view class="delete-btn" catchtap="deleteUpload" data-id="{{item.id}}">删除</view>
+        </view>
+      </block>
+    </view>
+  </view>
 </view>

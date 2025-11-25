@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/alliance/alliance",
+    "pages/alliance/analysis/analysis",
     "pages/resource/resource",
     "pages/battle/battle",
     "pages/profile/profile"
@@ -19,25 +20,25 @@
       {
         "pagePath": "pages/alliance/alliance",
         "text": "同盟管理",
-        "iconPath": "",
-        "selectedIconPath": ""
+        "iconPath": "static/icons/alliance_un.png",
+        "selectedIconPath": "static/icons/alliance.png"
       },
       {
         "pagePath": "pages/resource/resource",
         "text": "资源州铜",
-        "iconPath": "",
-        "selectedIconPath": ""
+        "iconPath": "static/icons/resource_un.png",
+        "selectedIconPath": "static/icons/resource.png"
       },
       {
         "pagePath": "pages/battle/battle",
         "text": "战功识别",
-        "iconPath": "",
-        "selectedIconPath": ""
+        "iconPath": "static/icons/battle_un.png",
+        "selectedIconPath": "static/icons/battle.png"
       },
       {
         "pagePath": "pages/profile/profile",
         "text": "个人中心",
-        "iconPath": "static/icons/profile.png",
+        "iconPath": "static/icons/profile_un.png",
         "selectedIconPath": "static/icons/profile.png"
       }
     ]
