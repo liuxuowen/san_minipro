@@ -21,9 +21,9 @@
       <view class="divider"></view>
 
       <view class="group-selector">
-        <block wx:for="{{groups}}" wx:key="*this">
-          <view class="group-tab {{currentGroup === item ? 'active' : ''}}" bindtap="selectGroup" data-group="{{item}}">
-            {{item}}
+        <block wx:for="{{groups}}" wx:key="value">
+          <view class="group-tab {{currentGroup === item.value ? 'active' : ''}}" bindtap="selectGroup" data-group="{{item.value}}">
+            {{item.label}}
           </view>
         </block>
       </view>

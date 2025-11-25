@@ -32,38 +32,75 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-# 2. Package and Upload
-# Use tar (Windows 10+ includes tar)
-$TimeStamp = Get-Date -Format "yyyyMMddHHmmss"
-$TarFile = "deploy_package_$TimeStamp.tar.gz"
-
-Write-Host "[*] Packaging files..." -ForegroundColor Cyan
-# Exclude unnecessary files
-tar --exclude "__pycache__" --exclude "*.pyc" --exclude ".git" --exclude "venv" --exclude ".idea" -czf $TarFile -C $LOCAL_PATH .
-
-if (-not (Test-Path $TarFile)) {
-    Write-Host "[-] Packaging failed" -ForegroundColor Red
-    exit 1
+# 2. Deploy Files
+# Check if rsync is available
+if (Get-Command "rsync" -ErrorAction SilentlyContinue) {
+    Write-Host "[*] rsync detected. Using rsync for deployment..." -ForegroundColor Cyan
+    
+    # Convert Windows path to Cygwin/MSYS path if needed (simple heuristic)
+    # This assumes rsync expects /cygdrive/c/ style or standard paths.
+    # For simplicity, we rely on relative path which usually works.
+    
+    # Note: We need to handle permissions for the key file if rsync complains.
+    # rsync -avz --exclude ... -e "ssh -i key" src dest
+    
+    $Excludes = @("--exclude='__pycache__'", "--exclude='*.pyc'", "--exclude='.git'", "--exclude='venv'", "--exclude='.idea'", "--exclude='.venv'")
+    $RsyncCmd = "rsync -avz $($Excludes -join ' ') -e 'ssh -i `"$PEM_PATH`" -o StrictHostKeyChecking=no' $LOCAL_PATH/ $SERVER_USER@${SERVER_IP}:$REMOTE_PATH/"
+    
+    # Execute rsync using Invoke-Expression to handle quoting
+    Invoke-Expression $RsyncCmd
+    
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "[-] rsync failed. Falling back to tar+scp..." -ForegroundColor Yellow
+        $UseTar = $true
+    } else {
+        $UseTar = $false
+    }
+} else {
+    Write-Host "[*] rsync not found. Using tar+scp..." -ForegroundColor Cyan
+    $UseTar = $true
 }
 
-Write-Host "[*] Uploading files..." -ForegroundColor Cyan
-scp -i "$PEM_PATH" -o StrictHostKeyChecking=no $TarFile "$SERVER_USER@${SERVER_IP}:$REMOTE_PATH/$TarFile"
+if ($UseTar) {
+    # Use tar (Windows 10+ includes tar)
+    $TimeStamp = Get-Date -Format "yyyyMMddHHmmss"
+    $TarFile = "deploy_package_$TimeStamp.tar.gz"
 
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "[-] Upload failed" -ForegroundColor Red
-    Remove-Item $TarFile
-    exit 1
+    Write-Host "[*] Packaging files..." -ForegroundColor Cyan
+    # Exclude unnecessary files
+    tar --exclude "__pycache__" --exclude "*.pyc" --exclude ".git" --exclude "venv" --exclude ".idea" --exclude ".venv" -czf $TarFile -C $LOCAL_PATH .
+
+    if (-not (Test-Path $TarFile)) {
+        Write-Host "[-] Packaging failed" -ForegroundColor Red
+        exit 1
+    }
+
+    Write-Host "[*] Uploading files..." -ForegroundColor Cyan
+    scp -i "$PEM_PATH" -o StrictHostKeyChecking=no $TarFile "$SERVER_USER@${SERVER_IP}:$REMOTE_PATH/$TarFile"
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "[-] Upload failed" -ForegroundColor Red
+        Remove-Item $TarFile
+        exit 1
+    }
+    
+    # Extract command for tar mode
+    $ExtractCmd = "cd $REMOTE_PATH && tar -xzf $TarFile && rm $TarFile"
+} else {
+    $ExtractCmd = "cd $REMOTE_PATH"
 }
 
-# 3. Extract and Restart Service
-Write-Host "[*] Extracting and restarting service..." -ForegroundColor Cyan
+# 3. Restart Service
+Write-Host "[*] Restarting service..." -ForegroundColor Cyan
 # We add a sed command to remove Windows carriage returns (\r) from .sh files to avoid "required file not found" errors
 # Also add chmod +x to ensure scripts are executable
 # Execute setup_remote.sh to handle dependencies, db init, and service restart
-$RemoteCommand = "cd $REMOTE_PATH && tar -xzf $TarFile && rm $TarFile && sed -i 's/\r$//' *.sh && chmod +x *.sh && bash setup_remote.sh"
+$RemoteCommand = "$ExtractCmd && sed -i 's/\r$//' *.sh && chmod +x *.sh && bash setup_remote.sh"
 ssh -i "$PEM_PATH" -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_IP" $RemoteCommand
 
-# Clean up local file
-Remove-Item $TarFile
+if ($UseTar) {
+    # Clean up local file
+    Remove-Item $TarFile
+}
 
 Write-Host "[+] Deployment complete!" -ForegroundColor Green

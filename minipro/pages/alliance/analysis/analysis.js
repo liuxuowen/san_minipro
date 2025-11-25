@@ -57,25 +57,56 @@ Page({
       success: (res) => {
         if (res.data.success) {
           const images = res.data.images || [];
-          // Extract groups from images
-          // Ensure '全盟' is first if it exists
-          let groups = images.map(img => img.group);
+          const results = res.data.results || [];
+
+          // Calculate counts
+          const counts = {};
+          results.forEach(r => {
+             const g = r.group || '未分组';
+             counts[g] = (counts[g] || 0) + 1;
+          });
+          counts['全盟'] = results.length;
+
+          // Create group objects
+          let groupObjs = images.map(img => {
+              const name = img.group;
+              const count = counts[name] || 0;
+              return {
+                  value: name,
+                  label: `${name} (${count})`,
+                  count: count
+              };
+          });
+
+          // Sort: 全盟 first, 未分组 last, others by count desc
+          groupObjs.sort((a, b) => {
+              if (a.value === '全盟') return -1;
+              if (b.value === '全盟') return 1;
+              if (a.value === '未分组') return 1;
+              if (b.value === '未分组') return -1;
+              return b.count - a.count;
+          });
           
           // Find default image (全盟)
           let currentImage = '';
+          let currentGroup = '全盟';
+
           const allImg = images.find(img => img.group === '全盟');
           if (allImg) {
             currentImage = allImg.url;
           } else if (images.length > 0) {
-            currentImage = images[0].url;
-            this.setData({ currentGroup: images[0].group });
+            // If no '全盟', use the first one from sorted list
+            currentGroup = groupObjs[0].value;
+            const firstImg = images.find(img => img.group === currentGroup);
+            currentImage = firstImg ? firstImg.url : '';
           }
 
           this.setData({
-            early_ts: res.data.early_ts,
-            late_ts: res.data.late_ts,
+            early_ts: this.formatShichen(res.data.early_ts),
+            late_ts: this.formatShichen(res.data.late_ts),
             images: images,
-            groups: groups,
+            groups: groupObjs,
+            currentGroup: currentGroup,
             currentImage: currentImage,
             loading: false
           });
@@ -90,6 +121,28 @@ Page({
         this.setData({ loading: false });
       }
     });
+  },
+
+  formatShichen(timeStr) {
+    // timeStr format: YYYY-MM-DD HH:MM
+    if (!timeStr) return '';
+    
+    // Parse date manually to avoid timezone issues or browser inconsistencies
+    // "2025-11-25 22:12"
+    const parts = timeStr.split(' ');
+    if (parts.length < 2) return timeStr;
+    
+    const datePart = parts[0];
+    const timePart = parts[1];
+    const hour = parseInt(timePart.split(':')[0], 10);
+    
+    const shichens = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+    // 子: 23-1, 丑: 1-3, ...
+    // (hour + 1) // 2 % 12
+    const index = Math.floor((hour + 1) / 2) % 12;
+    const shichen = shichens[index];
+    
+    return `${datePart} ${shichen}时`;
   },
 
   selectGroup(e) {
