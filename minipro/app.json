@@ -37,8 +37,8 @@
       {
         "pagePath": "pages/profile/profile",
         "text": "个人中心",
-        "iconPath": "",
-        "selectedIconPath": ""
+        "iconPath": "static/icons/profile.png",
+        "selectedIconPath": "static/icons/profile.png"
       }
     ]
   },

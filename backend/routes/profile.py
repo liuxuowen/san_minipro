@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 import requests
 import os
 from datetime import datetime
@@ -7,16 +7,16 @@ from models import User
 
 profile_bp = Blueprint('profile', __name__)
 
-# 微信小程序配置
-APP_ID = os.getenv('WECHAT_APP_ID', 'YOUR_APP_ID')
-APP_SECRET = os.getenv('WECHAT_APP_SECRET', 'YOUR_APP_SECRET')
-
 @profile_bp.route('/api/login', methods=['POST'])
 def login():
     data = request.json
     code = data.get('code')
     if not code:
         return jsonify({'error': 'Missing code'}), 400
+
+    # 获取配置
+    APP_ID = current_app.config.get('WECHAT_APP_ID')
+    APP_SECRET = current_app.config.get('WECHAT_APP_SECRET')
 
     # 调用微信接口获取 openid
     openid = None
@@ -58,6 +58,7 @@ def login():
                 login_count=1
             )
             db.session.add(user)
+            print(f"INFO: New user created - OpenID: {openid}, Time: {now}")
         
         try:
             db.session.commit()

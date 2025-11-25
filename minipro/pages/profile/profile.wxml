@@ -1,15 +1,13 @@
 <view class="container">
   <view class="userinfo">
-    <block wx:if="{{!hasUserInfo}}">
-      <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
-        <image class="avatar" src="{{userInfo.avatarUrl || defaultAvatarUrl}}" mode="cover"></image>
-      </button> 
-      <input type="nickname" class="nickname-input" placeholder="请输入昵称" bind:change="onInputChange"/>
-    </block>
-    <block wx:else>
-      <image class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
-      <text class="userinfo-nickname">{{userInfo.nickName}}</text>
-    </block>
+    <!-- 始终允许点击头像进行修改 -->
+    <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+      <image class="avatar" src="{{userInfo.avatarUrl || defaultAvatarUrl}}" mode="cover"></image>
+    </button> 
+    
+    <!-- 始终显示输入框，允许用户随时修改昵称 -->
+    <!-- value 绑定 userInfo.nickName 以便回显 -->
+    <input type="nickname" class="nickname-input" placeholder="请输入昵称" value="{{userInfo.nickName}}" bind:change="onInputChange"/>
   </view>
   
   <view class="usermotto">

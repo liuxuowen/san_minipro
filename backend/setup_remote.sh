@@ -25,13 +25,20 @@ fi
 echo "正在安装依赖..."
 ./.venv/bin/pip install -r requirements.txt
 
-# 3. 配置 Systemd 服务
+# 3. 初始化数据库 (只运行一次，避免多进程竞争)
+echo "正在初始化数据库..."
+./.venv/bin/python3 init_db.py
+
+# 清理 pycache 防止代码缓存问题
+find . -name "__pycache__" -type d -exec rm -rf {} +
+
+# 4. 配置 Systemd 服务
 echo "配置 Systemd 服务..."
 cp san_backend.service /etc/systemd/system/
 systemctl daemon-reload
 systemctl enable san_backend
 
-# 4. 重启服务
+# 5. 重启服务
 echo "重启服务..."
 systemctl restart san_backend
 

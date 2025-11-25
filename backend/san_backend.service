@@ -8,7 +8,9 @@ User=root
 Group=root
 WorkingDirectory=/opt/projects/san_backend
 Environment="PATH=/opt/projects/san_backend/.venv/bin"
-ExecStart=/opt/projects/san_backend/.venv/bin/gunicorn --workers 3 --bind 0.0.0.0:5000 app:app
+Environment="PYTHONUNBUFFERED=1"
+# 使用 gthread 模式以更好处理并发和慢连接，增加超时时间防止网络波动导致的 worker 杀死
+ExecStart=/opt/projects/san_backend/.venv/bin/gunicorn --workers 1 --worker-class gthread --threads 2 --timeout 60 --bind 0.0.0.0:5000 app:app
 
 [Install]
 WantedBy=multi-user.target

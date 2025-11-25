@@ -20,6 +20,11 @@ if [ ! -d "$LOCAL_PATH" ]; then
     exit 1
 fi
 
+# 检查 .env 文件是否存在
+if [ ! -f "$LOCAL_PATH/.env" ]; then
+    echo "⚠️ 警告: 本地没有找到 .env 文件，服务器将使用默认配置或环境变量可能缺失！"
+fi
+
 echo "🚀 开始部署后端代码到 $SERVER_IP ..."
 
 # 1. 确保远程目录存在
@@ -37,14 +42,16 @@ fi
 # -v: 显示详细过程
 # -z: 压缩传输
 # --delete: 删除远程目录中本地不存在的文件（保持一致）
+# -I: 忽略修改时间，强制检查文件内容
 echo "🔄 正在同步文件..."
-rsync -avz --delete \
+rsync -avzI --delete \
     -e "ssh -i $PEM_PATH -o StrictHostKeyChecking=no" \
     --exclude '__pycache__' \
     --exclude '*.pyc' \
     --exclude '.DS_Store' \
     --exclude '.git' \
     --exclude 'venv' \
+    --exclude '.venv' \
     --exclude '.idea' \
     "$LOCAL_PATH" \
     "$SERVER_USER@$SERVER_IP:$REMOTE_PATH"
