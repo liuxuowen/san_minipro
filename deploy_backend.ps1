@@ -3,7 +3,7 @@
 $SERVER_IP = "101.201.106.39"
 $SERVER_USER = "root"
 # Please modify the PEM_PATH to your actual .pem file path on Windows
-$PEM_PATH = "C:\Users\liuxu\Documents\liuxu.pem"
+$PEM_PATH = "C:/Users/liuxu/Documents/liuxu.pem"
 $REMOTE_PATH = "/opt/projects/san_backend"
 $LOCAL_PATH = ".\backend"
 # ===========================================
@@ -32,6 +32,22 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
+# 1.5 Ensure rsync is installed on remote (if using rsync locally)
+if (Get-Command "rsync" -ErrorAction SilentlyContinue) {
+    Write-Host "[*] Checking for remote rsync..." -ForegroundColor Cyan
+    # Check and install rsync on remote if missing
+    # We try apt-get (Debian/Ubuntu) and yum (CentOS/RHEL)
+    $InstallRsyncCmd = "if ! command -v rsync &> /dev/null; then echo 'Installing rsync...'; if command -v apt-get &> /dev/null; then apt-get update && apt-get install -y rsync; elif command -v yum &> /dev/null; then yum install -y rsync; fi; fi"
+    ssh -i "$PEM_PATH" -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_IP" $InstallRsyncCmd
+    
+    # Verify remote rsync
+    Write-Host "[*] Verifying remote rsync..." -ForegroundColor Cyan
+    ssh -i "$PEM_PATH" -o StrictHostKeyChecking=no "$SERVER_USER@$SERVER_IP" "rsync --version" | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "[-] Remote rsync seems to be missing or malfunctioning." -ForegroundColor Yellow
+    }
+}
+
 # 2. Deploy Files
 # Check if rsync is available
 if (Get-Command "rsync" -ErrorAction SilentlyContinue) {
@@ -45,7 +61,8 @@ if (Get-Command "rsync" -ErrorAction SilentlyContinue) {
     # rsync -avz --exclude ... -e "ssh -i key" src dest
     
     $Excludes = @("--exclude='__pycache__'", "--exclude='*.pyc'", "--exclude='.git'", "--exclude='venv'", "--exclude='.idea'", "--exclude='.venv'")
-    $RsyncCmd = "rsync -avz $($Excludes -join ' ') -e 'ssh -i `"$PEM_PATH`" -o StrictHostKeyChecking=no' $LOCAL_PATH/ $SERVER_USER@${SERVER_IP}:$REMOTE_PATH/"
+    # Added -q to ssh to suppress banner/motd which can confuse rsync protocol
+    $RsyncCmd = "rsync -avz $($Excludes -join ' ') -e 'ssh -q -i `"$PEM_PATH`" -o StrictHostKeyChecking=no' $LOCAL_PATH/ $SERVER_USER@${SERVER_IP}:$REMOTE_PATH/"
     
     # Execute rsync using Invoke-Expression to handle quoting
     Invoke-Expression $RsyncCmd

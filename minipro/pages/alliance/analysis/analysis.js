@@ -21,19 +21,16 @@ Page({
     let metric = 'battle';
     
     if (type === 'battle') {
-      title = '战功对比';
+      title = '同盟战功值对比';
       metric = 'battle';
     } else if (type === 'power') {
-      title = '势力值对比';
+      title = '同盟势力值对比';
       metric = 'power';
-    } else if (type === 'contrib') {
-      title = '贡献对比';
-      metric = 'contribution';
     } else if (type === 'assist') {
-      title = '助攻对比';
+      title = '同盟攻城值对比';
       metric = 'assist';
     } else if (type === 'donation') {
-      title = '捐献对比';
+      title = '同盟罚款捐献对比';
       metric = 'donation';
     }
     

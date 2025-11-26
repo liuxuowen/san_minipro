@@ -1,25 +1,24 @@
 <view class="container">
-  <view class="nav-bar">
-    <view class="breadcrumb" bindtap="goBack">
-      <text class="back-icon">❮</text>
-      <text class="back-text">返回我的数据</text>
-    </view>
-  </view>
-
-  <view class="loading" wx:if="{{loading}}">
-    <text>正在分析数据...</text>
+  <view class="loading-container" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">正在进行数据分析并生成图片...</text>
   </view>
 
   <view class="content" wx:else>
     <!-- Combined Card: Header + Group Selector -->
     <view class="info-card">
+      <view class="card-header-row">
+        <view class="breadcrumb" bindtap="goBack">
+          <text class="back-icon">←</text>
+          <text class="back-text">返回我的数据</text>
+        </view>
+      </view>
+
       <view class="header-section">
         <view class="title">{{title}}</view>
         <view class="subtitle">{{early_ts}} -> {{late_ts}}</view>
       </view>
       
-      <view class="divider"></view>
-
       <view class="group-selector">
         <block wx:for="{{groups}}" wx:key="value">
           <view class="group-tab {{currentGroup === item.value ? 'active' : ''}}" bindtap="selectGroup" data-group="{{item.value}}">

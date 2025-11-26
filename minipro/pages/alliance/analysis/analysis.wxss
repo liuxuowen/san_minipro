@@ -5,6 +5,7 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  justify-content: flex-start; /* Override app.wxss space-between */
 }
 
 .nav-bar {
@@ -40,9 +41,15 @@
   box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.05);
 }
 
+.card-header-row {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 10rpx;
+}
+
 .header-section {
   text-align: center;
-  margin-bottom: 20rpx;
+  margin-bottom: 30rpx;
 }
 
 .title {
@@ -55,12 +62,6 @@
 .subtitle {
   font-size: 24rpx;
   color: #666;
-}
-
-.divider {
-  height: 1rpx;
-  background: #eee;
-  margin: 20rpx 0;
 }
 
 .group-selector {
@@ -112,4 +113,42 @@
   text-align: center;
   padding: 50rpx;
   color: #999;
+}
+
+/* Loading Animation */
+.loading-container {
+  position: fixed;
+  top: 40%; /* Slightly above center visually */
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 40rpx 60rpx;
+  border-radius: 20rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.1);
+}
+
+.loading-spinner {
+  width: 60rpx;
+  height: 60rpx;
+  border: 6rpx solid #f3f3f3;
+  border-top: 6rpx solid #576b95; /* WeChat Blue */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20rpx;
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

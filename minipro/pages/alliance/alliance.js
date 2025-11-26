@@ -145,6 +145,13 @@ Page({
     });
   },
 
+  viewDetail(e) {
+    const id = e.currentTarget.dataset.id;
+    wx.navigateTo({
+      url: `/pages/alliance/detail/detail?id=${id}`
+    });
+  },
+
   deleteUpload(e) {
     const id = e.currentTarget.dataset.id;
     wx.showModal({

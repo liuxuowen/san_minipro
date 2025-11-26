@@ -8,7 +8,7 @@ from datetime import datetime
 class ImageGenerator:
     def __init__(self, resource_dir):
         self.resource_dir = resource_dir
-        self.header_path = os.path.join(resource_dir, 'header.png')
+        self.header_path = os.path.join(resource_dir, 'header.jpg')
         self.idioms_path = os.path.join(resource_dir, 'idioms100.json')
         self.idioms_list = self._load_idioms()
 
@@ -72,11 +72,12 @@ class ImageGenerator:
             hour = dt.hour
             shichens = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥']
             index = (hour + 1) // 2 % 12
-            return f"{dt.strftime('%Y-%m-%d')} {shichens[index]}时"
+            return f"{dt.strftime('%Y年%m月%d日')} {shichens[index]}时"
         except:
             return time_str
 
-    def generate_comparison_images(self, results, early_ts, late_ts, metric_label, output_dir):
+    def generate_comparison_images(self, results, early_ts, late_ts, metric_label, output_dir, metric_key='battle'):
+        print(f"Starting image generation for {len(results)} items...")
         os.makedirs(output_dir, exist_ok=True)
         
         # Prepare data
@@ -100,11 +101,21 @@ class ImageGenerator:
                 render_list.append((g, groups[g]))
         
         # Load header image
+        TARGET_WIDTH = 1170 # iPhone standard width
+        
         try:
             header_img = Image.open(self.header_path).convert('RGBA')
         except Exception:
             # Fallback if header missing
             header_img = Image.new('RGBA', (800, 200), (200, 200, 200))
+            
+        # Resize header to target width
+        if header_img.width != TARGET_WIDTH:
+            ratio = TARGET_WIDTH / header_img.width
+            new_height = int(header_img.height * ratio)
+            # Use LANCZOS for high quality downsampling/upsampling
+            resample_method = getattr(Image, 'Resampling', Image).LANCZOS
+            header_img = header_img.resize((TARGET_WIDTH, new_height), resample_method)
             
         header_w, header_h = header_img.size
         
@@ -121,25 +132,22 @@ class ImageGenerator:
             
             return canvas
 
-        # Fonts
-        title_font = self._load_font(60) # Group Name (Large)
-        time_font = self._load_font(28)  # Time Range (Small)
-        table_font = self._load_font(28)
-        idiom_body_font = self._load_font(28) # Smaller
-        idiom_title_font = self._load_font(32) # Smaller
+        # Fonts - Scaled for 1170px width
+        table_font = self._load_font(48) # Table Content
+        idiom_body_font = self._load_font(36) # Idiom Body
+        idiom_title_font = self._load_font(42) # Idiom Title
 
-        table_line_height = max(int(self._measure_height(table_font, '汉')), 28)
-        row_height_base = table_line_height + 18
-        idiom_body_height = max(int(self._measure_height(idiom_body_font, '汉')), 28)
+        table_line_height = max(int(self._measure_height(table_font, '汉')), 36)
+        row_height_base = table_line_height + 32 # Increased padding
+        idiom_body_height = max(int(self._measure_height(idiom_body_font, '汉')), 36)
 
-        HEADER_BOTTOM_GAP = 40
-        TITLE_GAP = 20
-        GROUP_TITLE_GAP = 40
-        TABLE_BOTTOM_PADDING = 60
-        IDIOM_TOP_PADDING = 30
-        IDIOM_BOTTOM_PADDING = 30
-        IDIOM_LINE_SPACING = 10
-        TABLE_WIDTH_RATIO = 0.90 # Wider table
+        HEADER_BOTTOM_GAP = 60
+        GROUP_TITLE_GAP = 32
+        TABLE_BOTTOM_PADDING = 0
+        IDIOM_TOP_PADDING = 80
+        IDIOM_BOTTOM_PADDING = 100
+        IDIOM_LINE_SPACING = 20
+        TABLE_WIDTH_RATIO = 0.92 # Slightly wider table
         
         # Format times
         early_ts_fmt = self._format_shichen(early_ts)
@@ -149,6 +157,7 @@ class ImageGenerator:
         saved_paths = []
         
         for group_name, items in render_list:
+            print(f"Generating image for group: {group_name} with {len(items)} items")
             if not items:
                 continue
                 
@@ -165,19 +174,18 @@ class ImageGenerator:
             if self.idioms_list:
                 idiom_entry = random.choice(self.idioms_list)
                 if isinstance(idiom_entry, dict) and '成语' in idiom_entry and '典故' in idiom_entry:
-                    idiom_title_text = f"学习文化 - 【{idiom_entry['成语']}】"
+                    idiom_title_text = f"{idiom_entry['成语']}"
                     idiom_story_lines = self._wrap_text(str(idiom_entry['典故']), idiom_body_font, header_w - 100) # Wider text area
 
             # Calculate Layout
             title1_y = header_h + HEADER_BOTTOM_GAP
-            title1_text = group_label
-            title1_h = self._measure_height(title_font, title1_text)
+            # Combined title: Group Name | Time -> Time
+            title1_text = f"{group_label} 丨 {time_range_text}"
+            # Use a slightly smaller font for the combined line to fit
+            combined_font = self._load_font(38) 
+            title1_h = self._measure_height(combined_font, title1_text)
             
-            title2_y = title1_y + title1_h + TITLE_GAP
-            title2_text = time_range_text
-            title2_h = self._measure_height(time_font, title2_text)
-            
-            table_start_y = int(title2_y + title2_h + GROUP_TITLE_GAP)
+            table_start_y = int(title1_y + title1_h + GROUP_TITLE_GAP)
 
             idiom_section_height = 0
             if idiom_title_text:
@@ -193,65 +201,84 @@ class ImageGenerator:
             draw = ImageDraw.Draw(canvas)
             img_w = canvas.width
 
-            # Draw Titles
-            # 1. Group Name (Black, Large)
-            draw.text((img_w // 2, title1_y), title1_text, font=title_font, fill=(0, 0, 0, 255), anchor="ma")
-            # 2. Time Range (Gray, Small)
-            draw.text((img_w // 2, title2_y), title2_text, font=time_font, fill=(100, 100, 100, 255), anchor="ma")
-
             # Draw Table Header
             table_total_width = img_w * TABLE_WIDTH_RATIO
-            # Column widths: 60% Member, 40% Diff
-            col1_width = table_total_width * 0.6
-            col2_width = table_total_width * 0.4
-            
             table_left = (img_w - table_total_width) / 2
+
+            # Draw Titles
+            # Combined Title (Black) - Left aligned to table
+            draw.text((table_left, title1_y), title1_text, font=combined_font, fill=(0, 0, 0, 255), anchor="la")
+
+            # Column widths: 15% Rank, 45% Member, 40% Diff
+            col0_width = table_total_width * 0.15
+            col1_width = table_total_width * 0.45
+            col2_width = table_total_width * 0.4
             header_y = table_start_y
             header_center_y = header_y + row_height_base / 2
             
             # Centers for text
-            col1_center = table_left + col1_width / 2
-            col2_center = table_left + col1_width + col2_width / 2
+            col0_center = table_left + col0_width / 2
+            col1_center = table_left + col0_width + col1_width / 2
+            col2_center = table_left + col0_width + col1_width + col2_width / 2
             
-            col_titles = ["成员", f"{metric_label}差值"]
+            col_titles = ["#", "成员", f"{metric_label}差值"]
 
-            # Draw Header Background
-            draw.rectangle([table_left, header_y, table_left + table_total_width, header_y + row_height_base], fill=(230, 230, 230, 255))
+            # Draw Header Background (Orange)
+            draw.rectangle([table_left, header_y, table_left + table_total_width, header_y + row_height_base], fill=(255, 200, 120, 255))
 
             # Draw Header Text & Borders
-            # Col 1
-            draw.text((col1_center, header_center_y), col_titles[0], font=table_font, fill=(40, 40, 40, 255), anchor="mm")
-            draw.rectangle([table_left, header_y, table_left + col1_width, header_y + row_height_base], outline=(80, 80, 80, 255), width=2)
+            # Col 0 (#)
+            draw.text((col0_center, header_center_y), col_titles[0], font=table_font, fill=(40, 40, 40, 255), anchor="mm")
+            draw.rectangle([table_left, header_y, table_left + col0_width, header_y + row_height_base], outline=(80, 80, 80, 255), width=2)
+
+            # Col 1 (Member)
+            draw.text((col1_center, header_center_y), col_titles[1], font=table_font, fill=(40, 40, 40, 255), anchor="mm")
+            draw.rectangle([table_left + col0_width, header_y, table_left + col0_width + col1_width, header_y + row_height_base], outline=(80, 80, 80, 255), width=2)
             
-            # Col 2
-            draw.text((col2_center, header_center_y), col_titles[1], font=table_font, fill=(40, 40, 40, 255), anchor="mm")
-            draw.rectangle([table_left + col1_width, header_y, table_left + table_total_width, header_y + row_height_base], outline=(80, 80, 80, 255), width=2)
+            # Col 2 (Diff)
+            draw.text((col2_center, header_center_y), col_titles[2], font=table_font, fill=(40, 40, 40, 255), anchor="mm")
+            draw.rectangle([table_left + col0_width + col1_width, header_y, table_left + table_total_width, header_y + row_height_base], outline=(80, 80, 80, 255), width=2)
 
             # Draw Rows
-            high_delta_threshold = 5000 # Could be configurable
+            # Load thresholds from env based on metric_key
+            upper_key = f"THRESHOLD_{metric_key.upper()}_UPPER"
+            lower_key = f"THRESHOLD_{metric_key.upper()}_LOWER"
+            
+            try:
+                upper_threshold = int(os.environ.get(upper_key, 5000))
+                lower_threshold = int(os.environ.get(lower_key, 0))
+            except ValueError:
+                upper_threshold = 5000
+                lower_threshold = 0
             
             for row_idx, item in enumerate(items):
                 member = item['name']
                 delta = item['diff']
+                rank = row_idx + 1
                 
                 # Use integer math for row positions to avoid gaps
                 row_top = int(table_start_y + (row_idx + 1) * row_height_base)
                 row_bottom = int(table_start_y + (row_idx + 2) * row_height_base)
                 y_center = (row_top + row_bottom) / 2
                 
-                highlight_orange = (delta == 0)
-                highlight_green = (delta > high_delta_threshold)
+                # Determine background color
+                if delta >= upper_threshold:
+                    fill_color = (144, 238, 144, 180) # Green
+                elif delta <= lower_threshold:
+                    fill_color = (255, 140, 0, 180) # Dark Yellow/Orange
+                else:
+                    fill_color = BG_COLOR # Light Yellow (Same as canvas)
                 
-                # Fill background for cell (default white if not highlighted)
-                fill_color = (255, 255, 255, 255)
-                if highlight_orange:
-                    fill_color = (255, 140, 0, 180)
-                elif highlight_green:
-                    fill_color = (144, 238, 144, 180)
-                
+                # Draw Col 0 (Rank)
+                x0_0 = int(round(table_left))
+                x1_0 = int(round(table_left + col0_width))
+                draw.rectangle([x0_0, row_top, x1_0, row_bottom], fill=fill_color)
+                draw.rectangle([x0_0, row_top, x1_0, row_bottom], outline=(120, 120, 120, 255), width=1)
+                draw.text((col0_center, y_center), str(rank), font=table_font, fill=(0, 0, 0, 255), anchor="mm")
+
                 # Draw Col 1 (Member)
-                x0_1 = int(round(table_left))
-                x1_1 = int(round(table_left + col1_width))
+                x0_1 = x1_0
+                x1_1 = int(round(table_left + col0_width + col1_width))
                 draw.rectangle([x0_1, row_top, x1_1, row_bottom], fill=fill_color)
                 draw.rectangle([x0_1, row_top, x1_1, row_bottom], outline=(120, 120, 120, 255), width=1)
                 draw.text((col1_center, y_center), str(member), font=table_font, fill=(0, 0, 0, 255), anchor="mm")
@@ -277,7 +304,8 @@ class ImageGenerator:
                 draw.rectangle(idiom_bg_rect, fill=(255, 245, 230, 255), outline=(255, 200, 150, 255), width=1)
                 
                 title_height = self._measure_height(idiom_title_font, idiom_title_text)
-                draw.text((img_w // 2, idiom_top + IDIOM_TOP_PADDING/2 + title_height / 2), idiom_title_text, font=idiom_title_font, fill=(200, 100, 50, 255), anchor="mm")
+                # Left align idiom title (same x as story text)
+                draw.text((60, idiom_top + IDIOM_TOP_PADDING/2 + title_height / 2), idiom_title_text, font=idiom_title_font, fill=(200, 100, 50, 255), anchor="lm")
                 
                 story_start_y = idiom_top + IDIOM_TOP_PADDING/2 + title_height + (IDIOM_LINE_SPACING if idiom_story_lines else 0)
                 for idx, line in enumerate(idiom_story_lines):

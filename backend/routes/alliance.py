@@ -16,6 +16,19 @@ def get_uploads():
         'uploads': [u.to_dict() for u in uploads]
     })
 
+@alliance_bp.route('/api/alliance/detail/<int:upload_id>', methods=['GET'])
+def get_upload_detail(upload_id):
+    record = UploadRecord.query.get(upload_id)
+    if not record:
+        return jsonify({'success': False, 'message': 'Record not found'})
+    
+    data = AllianceData.query.filter_by(upload_id=upload_id).order_by(AllianceData.rank).all()
+    return jsonify({
+        'success': True,
+        'record': record.to_dict(),
+        'data': [d.to_dict() for d in data]
+    })
+
 def parse_int(value):
     """Helper to parse integer from string, handling empty or invalid values."""
     if not value:
@@ -117,7 +130,7 @@ def upload_file():
                     
                     if first_row:
                         print(f"CSV Headers detected: {list(clean_row.keys())}")
-                        print(f"First row sample: {clean_row}")
+                        #print(f"First row sample: {clean_row}")
                         first_row = False
 
                     # 查找对应的列值
@@ -225,11 +238,11 @@ def compare_uploads():
     early_data = AllianceData.query.filter_by(upload_id=early_record.id).all()
     late_data = AllianceData.query.filter_by(upload_id=late_record.id).all()
 
-    print(f"Comparing Upload {early_record.id} ({len(early_data)}) vs {late_record.id} ({len(late_data)})")
-    if early_data:
-        print(f"Sample Early: {early_data[0].name} - Battle: {early_data[0].battle_achievement}")
-    if late_data:
-        print(f"Sample Late: {late_data[0].name} - Battle: {late_data[0].battle_achievement}")
+    print(f"Comparing Upload, id {early_record.id} ({len(early_data)}) vs id {late_record.id} ({len(late_data)})")
+    # if early_data:
+    #     print(f"Sample Early: {early_data[0].name} - Battle: {early_data[0].battle_achievement}")
+    # if late_data:
+    #     print(f"Sample Late: {late_data[0].name} - Battle: {late_data[0].battle_achievement}")
 
     # Helper to get metric value
     def get_metric_value(item, metric_name):
@@ -275,16 +288,17 @@ def compare_uploads():
 
     # Generate Images
     try:
+        print("Initializing ImageGenerator...")
         resource_dir = os.path.join(current_app.root_path, 'resources')
         output_dir = os.path.join(current_app.root_path, 'static', 'generated')
         generator = ImageGenerator(resource_dir)
         
         metric_label = {
-            'battle': '战功',
+            'battle': '战功值',
             'power': '势力值',
             'contribution': '贡献',
-            'assist': '助攻',
-            'donation': '捐献'
+            'assist': '攻城值',
+            'donation': '罚款捐献'
         }.get(metric, metric)
         
         image_paths = generator.generate_comparison_images(
@@ -292,7 +306,8 @@ def compare_uploads():
             early_ts.strftime('%Y-%m-%d %H:%M'), 
             late_ts.strftime('%Y-%m-%d %H:%M'), 
             metric_label, 
-            output_dir
+            output_dir,
+            metric
         )
         
         # Add image URLs to response

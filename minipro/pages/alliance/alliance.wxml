@@ -12,18 +12,20 @@
     </view>
     
     <view class="analysis-actions">
-      <button class="analysis-btn {{canCompare ? '' : 'is-disabled'}}" bindtap="onAnalyze" data-type="battle">战功</button>
-      <button class="analysis-btn {{canCompare ? '' : 'is-disabled'}}" bindtap="onAnalyze" data-type="power">势力</button>
-      <button class="analysis-btn {{canCompare ? '' : 'is-disabled'}}" bindtap="onAnalyze" data-type="contrib">贡献</button>
-      <button class="analysis-btn {{canCompare ? '' : 'is-disabled'}}" bindtap="onAnalyze" data-type="assist">助攻</button>
-      <button class="analysis-btn {{canCompare ? '' : 'is-disabled'}}" bindtap="onAnalyze" data-type="donation">捐献</button>
+      <button class="analysis-btn {{canCompare ? '' : 'is-disabled'}}" bindtap="onAnalyze" data-type="battle">战功值</button>
+      <button class="analysis-btn {{canCompare ? '' : 'is-disabled'}}" bindtap="onAnalyze" data-type="power">势力值</button>
+      <button class="analysis-btn {{canCompare ? '' : 'is-disabled'}}" bindtap="onAnalyze" data-type="assist">攻城值</button>
+      <button class="analysis-btn {{canCompare ? '' : 'is-disabled'}}" bindtap="onAnalyze" data-type="donation">罚款捐献</button>
     </view>
 
     <view class="uploads-list">
       <block wx:for="{{uploads}}" wx:key="id">
-        <view class="upload-item {{item.selected ? 'is-selected' : ''}}" bindtap="toggleSelection" data-id="{{item.id}}">
-          <view class="upload-info">
-            <text class="upload-text">{{item.ts}} (成员数: {{item.member_count}})</text>
+        <view class="upload-item {{item.selected ? 'is-selected' : ''}}">
+          <view class="upload-info" bindtap="toggleSelection" data-id="{{item.id}}">
+            <text class="upload-text">{{item.display_time}}</text>
+          </view>
+          <view class="upload-detail-link" catchtap="viewDetail" data-id="{{item.id}}">
+            <text>（成员数: {{item.member_count}}）</text>
           </view>
           <view class="delete-btn" catchtap="deleteUpload" data-id="{{item.id}}">删除</view>
         </view>

@@ -33,11 +33,22 @@ class UploadRecord(db.Model):
     # user_id = db.Column(db.String(64), db.ForeignKey('users.openid'))
 
     def to_dict(self):
+        # Helper for Shichen format
+        def format_shichen(dt):
+            if not dt: return ""
+            hour = dt.hour
+            shichens = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥']
+            index = (hour + 1) // 2 % 12
+            return f"{dt.strftime('%Y-%m-%d')} {shichens[index]}时"
+
+        display_dt = self.stats_time if self.stats_time else self.upload_time
+        
         return {
             'id': self.id,
             'filename': self.filename,
             'ts': self.upload_time.strftime('%Y-%m-%d %H:%M:%S'),
             'stats_time': self.stats_time.strftime('%Y-%m-%d %H:%M:%S') if self.stats_time else None,
+            'display_time': format_shichen(display_dt),
             'member_count': self.member_count
         }
 
@@ -48,6 +59,23 @@ class AllianceData(db.Model):
     rank = db.Column(db.Integer, default=0)
     name = db.Column(db.String(64), nullable=False)
     group_name = db.Column(db.String(64), default='未分组')
+    contribution = db.Column(db.Integer, default=0)
+    power = db.Column(db.Integer, default=0)
+    battle_achievement = db.Column(db.Integer, default=0)
+    assist = db.Column(db.Integer, default=0)
+    donation = db.Column(db.Integer, default=0)
+
+    def to_dict(self):
+        return {
+            'rank': self.rank,
+            'name': self.name,
+            'group_name': self.group_name,
+            'contribution': self.contribution,
+            'power': self.power,
+            'battle_achievement': self.battle_achievement,
+            'assist': self.assist,
+            'donation': self.donation
+        }
     contribution = db.Column(db.Integer, default=0)
     power = db.Column(db.Integer, default=0)
     battle_achievement = db.Column(db.Integer, default=0)

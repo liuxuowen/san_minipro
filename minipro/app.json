@@ -2,6 +2,7 @@
   "pages": [
     "pages/alliance/alliance",
     "pages/alliance/analysis/analysis",
+    "pages/alliance/detail/detail",
     "pages/resource/resource",
     "pages/battle/battle",
     "pages/profile/profile"

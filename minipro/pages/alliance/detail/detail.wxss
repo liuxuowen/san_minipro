@@ -1,0 +1,85 @@
+.container {
+  padding: 0;
+  background-color: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  padding: 30rpx;
+  background-color: #f8f8f8;
+  border-bottom: 1rpx solid #eee;
+}
+
+.title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.subtitle {
+  font-size: 24rpx;
+  color: #666;
+  margin-top: 10rpx;
+}
+
+.table-container {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.table {
+  display: inline-block;
+  min-width: 100%;
+}
+
+.tr {
+  display: flex;
+  width: max-content; /* Allow row to grow */
+}
+
+.th, .td {
+  padding: 20rpx;
+  text-align: center;
+  font-size: 26rpx;
+  border-bottom: 1rpx solid #eee;
+  width: 140rpx; /* Default width */
+  display: inline-block;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.header-row {
+  background-color: #f0f0f0;
+  font-weight: bold;
+  color: #333;
+}
+
+.fixed-col {
+  position: sticky;
+  left: 0;
+  background-color: inherit;
+  z-index: 2;
+  width: 100rpx;
+  border-right: 1rpx solid #eee;
+}
+
+.fixed-col-2 {
+  position: sticky;
+  left: 100rpx;
+  background-color: inherit;
+  z-index: 2;
+  width: 180rpx;
+  border-right: 1rpx solid #eee;
+}
+
+.even {
+  background-color: #fff;
+}
+
+.odd {
+  background-color: #fafafa;
+}
