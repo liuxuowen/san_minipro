@@ -4,22 +4,106 @@ Page({
   data: {
     uploads: [],
     selectedIds: [],
-    canCompare: false
+    canCompare: false,
+    allianceName: ''
   },
 
   onLoad() {
     this.fetchUploads();
+    this.loadAllianceName();
   },
 
   onShow() {
     // 每次显示页面时刷新列表
     this.fetchUploads();
+    this.loadAllianceName();
+  },
+
+  loadAllianceName() {
+    const userInfo = wx.getStorageSync('userInfo');
+    if (userInfo && userInfo.alliance_name) {
+      this.setData({ allianceName: userInfo.alliance_name });
+    }
+  },
+
+  editAllianceName() {
+    const that = this;
+    wx.showModal({
+      title: '设置联盟名称',
+      content: this.data.allianceName || '',
+      editable: true,
+      placeholderText: '请输入联盟名称（最多6个字）',
+      success(res) {
+        if (res.confirm) {
+          const newName = res.content.trim();
+          if (!newName) return;
+          if (newName.length > 6) {
+            wx.showToast({
+              title: '名称最多6个字',
+              icon: 'none'
+            });
+            return;
+          }
+          
+          that.updateAllianceName(newName);
+        }
+      }
+    });
+  },
+
+  updateAllianceName(name) {
+    const openid = wx.getStorageSync('openid');
+    if (!openid) {
+      wx.showToast({
+        title: '请先在个人中心登录',
+        icon: 'none'
+      });
+      return;
+    }
+
+    wx.request({
+      url: `${app.globalData.apiBaseUrl}/api/user/alliance`,
+      method: 'POST',
+      data: {
+        openid: openid,
+        alliance_name: name
+      },
+      success: (res) => {
+        if (res.data.success) {
+          this.setData({ allianceName: name });
+          // Update storage
+          const userInfo = wx.getStorageSync('userInfo') || {};
+          userInfo.alliance_name = name;
+          wx.setStorageSync('userInfo', userInfo);
+          
+          wx.showToast({
+            title: '设置成功',
+            icon: 'success'
+          });
+        } else {
+          wx.showToast({
+            title: res.data.error || '设置失败',
+            icon: 'none'
+          });
+        }
+      },
+      fail: () => {
+        wx.showToast({
+          title: '网络错误',
+          icon: 'none'
+        });
+      }
+    });
   },
 
   fetchUploads() {
+    const openid = wx.getStorageSync('openid');
     wx.request({
       url: `${app.globalData.apiBaseUrl}/api/alliance/uploads`,
       method: 'GET',
+      data: {
+        openid: openid
+      },
       success: (res) => {
         if (res.data && res.data.uploads) {
           // 保留选中状态
@@ -80,7 +164,8 @@ Page({
         filePath: file.path,
         name: 'file',
         formData: {
-          'filename': file.name
+          'filename': file.name,
+          'openid': wx.getStorageSync('openid')
         },
         success: (res) => {
           try {

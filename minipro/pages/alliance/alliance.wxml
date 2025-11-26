@@ -7,14 +7,18 @@
   </view>
 
   <view class="card" wx:if="{{uploads.length > 0}}">
-    <view class="section-header">
-      <text class="section-title">我的数据</text>
+    <view class="section-header alliance-name-container">
+      <text class="section-title">我的同盟数据</text>
+      <view class="alliance-name-wrapper" bindtap="editAllianceName">
+        <text class="alliance-name">{{allianceName || '设置联盟名称'}}</text>
+        <text class="edit-icon">✎</text>
+      </view>
     </view>
     
     <view class="analysis-actions">
-      <button class="analysis-btn {{canCompare ? '' : 'is-disabled'}}" bindtap="onAnalyze" data-type="battle">战功值</button>
-      <button class="analysis-btn {{canCompare ? '' : 'is-disabled'}}" bindtap="onAnalyze" data-type="power">势力值</button>
-      <button class="analysis-btn {{canCompare ? '' : 'is-disabled'}}" bindtap="onAnalyze" data-type="assist">攻城值</button>
+      <button class="analysis-btn {{canCompare ? '' : 'is-disabled'}}" bindtap="onAnalyze" data-type="battle">战功差值</button>
+      <button class="analysis-btn {{canCompare ? '' : 'is-disabled'}}" bindtap="onAnalyze" data-type="power">势力差值</button>
+      <button class="analysis-btn {{canCompare ? '' : 'is-disabled'}}" bindtap="onAnalyze" data-type="assist">攻城差值</button>
       <button class="analysis-btn {{canCompare ? '' : 'is-disabled'}}" bindtap="onAnalyze" data-type="donation">罚款捐献</button>
     </view>
 

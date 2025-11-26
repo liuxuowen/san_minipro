@@ -96,3 +96,56 @@ def update_user():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
+@profile_bp.route('/api/user/alliance', methods=['POST'])
+def update_alliance():
+    data = request.json
+    openid = data.get('openid')
+    alliance_name = data.get('alliance_name')
+    
+    if not openid:
+        return jsonify({'error': 'Missing openid'}), 400
+    
+    if not alliance_name:
+        return jsonify({'error': 'Missing alliance_name'}), 400
+        
+    if len(alliance_name) > 6:
+        return jsonify({'error': 'Alliance name too long'}), 400
+        
+    user = User.query.get(openid)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+        
+    user.alliance_name = alliance_name
+    
+    try:
+        db.session.commit()
+        return jsonify({'success': True, 'user': user.to_dict()})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@profile_bp.route('/api/user/season', methods=['POST'])
+def update_season():
+    data = request.json
+    openid = data.get('openid')
+    season = data.get('season')
+    
+    if not openid:
+        return jsonify({'error': 'Missing openid'}), 400
+    
+    if not season:
+        return jsonify({'error': 'Missing season'}), 400
+        
+    user = User.query.get(openid)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+        
+    user.season = season
+    
+    try:
+        db.session.commit()
+        return jsonify({'success': True, 'user': user.to_dict()})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500

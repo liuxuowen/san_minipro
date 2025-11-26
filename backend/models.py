@@ -9,6 +9,8 @@ class User(db.Model):
     registration_time = db.Column(db.DateTime, default=datetime.now)
     last_login_time = db.Column(db.DateTime, default=datetime.now)
     login_count = db.Column(db.Integer, default=1)
+    alliance_name = db.Column(db.String(6), nullable=True)
+    season = db.Column(db.String(64), default='S1')
 
     def to_dict(self):
         return {
@@ -17,7 +19,9 @@ class User(db.Model):
             'avatar_url': self.avatar_url,
             'registration_time': self.registration_time.isoformat(),
             'last_login_time': self.last_login_time.isoformat(),
-            'login_count': self.login_count
+            'login_count': self.login_count,
+            'alliance_name': self.alliance_name,
+            'season': self.season
         }
 
 class UploadRecord(db.Model):
@@ -29,8 +33,8 @@ class UploadRecord(db.Model):
     # 存储从文件名解析出的统计时间，用于去重
     stats_time = db.Column(db.DateTime, nullable=True)
     
-    # 可以添加更多字段，如关联的用户ID等
-    # user_id = db.Column(db.String(64), db.ForeignKey('users.openid'))
+    # 关联的用户ID
+    user_id = db.Column(db.String(64), db.ForeignKey('users.openid'), nullable=True)
 
     def to_dict(self):
         # Helper for Shichen format
@@ -39,17 +43,17 @@ class UploadRecord(db.Model):
             hour = dt.hour
             shichens = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥']
             index = (hour + 1) // 2 % 12
-            return f"{dt.strftime('%Y-%m-%d')} {shichens[index]}时"
+            return f"{dt.year}年{dt.month:02d}月{dt.day:02d}日 {shichens[index]}时"
 
         display_dt = self.stats_time if self.stats_time else self.upload_time
         
         return {
             'id': self.id,
             'filename': self.filename,
-            'ts': self.upload_time.strftime('%Y-%m-%d %H:%M:%S'),
-            'stats_time': self.stats_time.strftime('%Y-%m-%d %H:%M:%S') if self.stats_time else None,
-            'display_time': format_shichen(display_dt),
-            'member_count': self.member_count
+            'upload_time': self.upload_time.isoformat(),
+            'member_count': self.member_count,
+            'stats_time': display_dt.isoformat() if display_dt else None,
+            'display_time': format_shichen(display_dt) if display_dt else ""
         }
 
 class AllianceData(db.Model):
@@ -95,4 +99,23 @@ class AllianceData(db.Model):
             'battle_achievement': self.battle_achievement,
             'assist': self.assist,
             'donation': self.donation
+        }
+
+class ResourcePoint(db.Model):
+    __tablename__ = 'resource_points'
+    id = db.Column(db.Integer, primary_key=True)
+    season = db.Column(db.String(64), index=True)
+    county = db.Column(db.String(64))
+    level = db.Column(db.String(64))
+    x = db.Column(db.Integer)
+    y = db.Column(db.Integer)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'season': self.season,
+            'county': self.county,
+            'level': self.level,
+            'x': self.x,
+            'y': self.y
         }

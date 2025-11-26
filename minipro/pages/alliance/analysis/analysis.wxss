@@ -53,30 +53,30 @@
 }
 
 .title {
-  font-size: 36rpx;
+  font-size: 30rpx;
   font-weight: bold;
   color: #333;
-  margin-bottom: 10rpx;
+  margin-bottom: 12rpx;
 }
 
 .subtitle {
-  font-size: 24rpx;
+  font-size: 22rpx;
   color: #666;
 }
 
 .group-selector {
   display: flex;
   flex-wrap: wrap;
-  gap: 20rpx;
+  gap: 16rpx;
   justify-content: center;
 }
 
 .group-tab {
   display: inline-block;
-  padding: 12rpx 34rpx;
+  padding: 8rpx 24rpx;
   background: #f5f5f5;
-  border-radius: 32rpx;
-  font-size: 26rpx;
+  border-radius: 24rpx;
+  font-size: 24rpx;
   color: #666;
   transition: all 0.3s ease;
 }

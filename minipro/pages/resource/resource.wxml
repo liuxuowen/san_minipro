@@ -1,3 +1,103 @@
 <view class="container">
-  <text>{{text}}</text>
+  <!-- Season Setting Header -->
+  <view class="season-header">
+    <view class="season-label">当前赛季</view>
+    <picker bindchange="bindSeasonChange" value="{{seasonIndex}}" range="{{seasons}}">
+      <view class="season-picker">
+        <text>{{seasons[seasonIndex] || '选择赛季'}}</text>
+        <text class="picker-arrow">▼</text>
+      </view>
+    </picker>
+  </view>
+
+  <!-- Tabs -->
+  <view class="tabs-container">
+    <view class="tab-item {{currentTab === 0 ? 'active' : ''}}" bindtap="switchTab" data-index="0">铜奴找铜</view>
+    <view class="tab-item {{currentTab === 1 ? 'active' : ''}}" bindtap="switchTab" data-index="1">铜奴迁城</view>
+    <!-- Placeholders for layout -->
+    <view class="tab-item placeholder"></view>
+    <view class="tab-item placeholder"></view>
+  </view>
+
+  <!-- Result Card (Fixed Position) -->
+  <view class="result-card">
+    <!-- Find Copper Results -->
+    <block wx:if="{{currentTab === 0}}">
+      <view class="result-list" wx:if="{{findResults.length > 0}}">
+        <view class="result-header">
+          <text>坐标</text>
+          <text>等级</text>
+          <text>距离</text>
+        </view>
+        <scroll-view scroll-y class="result-scroll">
+          <view class="result-item" wx:for="{{findResults}}" wx:key="id">
+            <text selectable user-select>({{item.x}}, {{item.y}})</text>
+            <text>{{item.level}}</text>
+            <text>{{item.distance}}</text>
+          </view>
+        </scroll-view>
+      </view>
+      <view class="instruction-text" wx:elif="{{!searchedFind}}">
+        <text>指令说明：\n1. 输入一个目标坐标\n2. 选择铜矿等级（8铜、9铜、10铜）\n3. 点击查找最近的10个资源点坐标</text>
+      </view>
+      <view class="no-result" wx:else>
+        未找到符合条件的铜矿
+      </view>
+    </block>
+
+    <!-- Relocation Results -->
+    <block wx:if="{{currentTab === 1}}">
+      <view class="result-list" wx:if="{{relocateResults.length > 0}}">
+        <view class="result-header">
+          <text class="col-wide">推荐坐标</text>
+          <text>5格10格</text>
+          <text>距离</text>
+        </view>
+        <scroll-view scroll-y class="result-scroll">
+          <view class="result-item" wx:for="{{relocateResults}}" wx:key="x">
+            <text class="col-wide" selectable user-select>({{item.x}}, {{item.y}})</text>
+            <text class="highlight">{{item.score5}}/{{item.score20}}</text>
+            <text>{{item.distance}}</text>
+          </view>
+        </scroll-view>
+        <view class="batch-btn-wrapper">
+          <button class="batch-btn" bindtap="nextBatch">换一批</button>
+        </view>
+      </view>
+      <view class="loading-tip" wx:elif="{{calculating}}">计算量较大，请耐心等待...</view>
+      <view class="instruction-text" wx:else>
+        <text>指令说明：\n1. 输入预期迁城的坐标\n2. 系统将计算50格范围内最佳迁城点\n3. 优先推荐5格内8铜密集的区域\n4. 如果位置不满意可换一批</text>
+      </view>
+    </block>
+  </view>
+
+  <!-- Bottom Controls -->
+  <view class="bottom-controls">
+    <!-- Find Copper Controls -->
+    <view class="control-group" wx:if="{{currentTab === 0}}">
+      <view class="input-row">
+        <input class="mini-input" type="number" placeholder="X坐标" model:value="{{findX}}" />
+        <input class="mini-input" type="number" placeholder="Y坐标" model:value="{{findY}}" />
+      </view>
+      <view class="action-row">
+        <picker class="mini-picker" bindchange="bindLevelChange" value="{{levelIndex}}" range="{{levels}}">
+          <view class="picker-inner">
+            {{levels[levelIndex]}} <text class="arrow">▼</text>
+          </view>
+        </picker>
+        <button class="mini-btn" bindtap="findCopper">查找铜矿</button>
+      </view>
+    </view>
+
+    <!-- Relocation Controls -->
+    <view class="control-group" wx:if="{{currentTab === 1}}">
+      <view class="input-row">
+        <input class="mini-input" type="number" placeholder="X坐标" model:value="{{relocateX}}" />
+        <input class="mini-input" type="number" placeholder="Y坐标" model:value="{{relocateY}}" />
+      </view>
+      <view class="action-row single-btn">
+        <button class="mini-btn full-width" bindtap="recommendRelocation">计算最佳迁城点</button>
+      </view>
+    </view>
+  </view>
 </view>

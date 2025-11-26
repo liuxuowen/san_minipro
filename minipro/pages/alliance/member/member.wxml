@@ -1,0 +1,62 @@
+<view class="container">
+  <view class="nav-bar">
+    <view class="breadcrumb">
+      <view class="nav-item" bindtap="goBackTwo">
+        <text class="back-icon">←</text>
+        <text class="back-text">返回我的数据</text>
+      </view>
+      <text class="separator">/</text>
+      <view class="nav-item" bindtap="goBackOne">
+        <text class="back-icon">←</text>
+        <text class="back-text">返回同盟数据</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="header">
+    <view class="title">{{name}} 历史趋势</view>
+  </view>
+
+  <view class="legend">
+    <view class="legend-item">
+      <view class="legend-color battle-color"></view>
+      <text>战功</text>
+    </view>
+    <view class="legend-item">
+      <view class="legend-color power-color"></view>
+      <text>势力</text>
+    </view>
+  </view>
+
+  <view class="chart-container">
+    <canvas 
+      type="2d" 
+      id="trendChart" 
+      class="chart"
+      bindtouchstart="handleTouch"
+      bindtouchmove="handleTouch"
+      bindtouchend="handleTouchEnd"
+    ></canvas>
+  </view>
+
+  <scroll-view scroll-y="true" class="table-container">
+    <view class="table">
+      <view class="tr header-row">
+        <view class="th">时间</view>
+        <view class="th">战功总量</view>
+        <view class="th">势力值</view>
+        <view class="th">助攻总量</view>
+        <view class="th">捐献总量</view>
+      </view>
+      <block wx:for="{{history}}" wx:key="ts">
+        <view class="tr {{index % 2 == 0 ? 'even' : 'odd'}}">
+          <view class="td">{{item.display_time}}</view>
+          <view class="td">{{item.battle}}</view>
+          <view class="td">{{item.power}}</view>
+          <view class="td">{{item.assist}}</view>
+          <view class="td">{{item.donation}}</view>
+        </view>
+      </block>
+    </view>
+  </scroll-view>
+</view>

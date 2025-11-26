@@ -1,31 +1,47 @@
 <view class="container">
-  <view class="header" wx:if="{{record}}">
-    <view class="title">{{record.display_time}}</view>
-    <view class="subtitle">成员数: {{record.member_count}}</view>
+  <view class="nav-bar">
+    <view class="breadcrumb" bindtap="goBack">
+      <text class="back-icon">←</text>
+      <text class="back-text">返回我的数据</text>
+    </view>
   </view>
 
-  <scroll-view scroll-x="true" class="table-container">
+  <view class="header" wx:if="{{record}}">
+    <view class="title">同盟数据详情</view>
+    <view class="subtitle">{{record.display_time}} 丨 成员数：{{record.member_count}}</view>
+  </view>
+
+  <view class="group-selector">
+    <picker bindchange="bindGroupChange" value="{{groupIndex}}" range="{{groups}}">
+      <view class="picker">
+        当前分组：{{groups[groupIndex]}}
+        <text class="picker-arrow">▼</text>
+      </view>
+    </picker>
+  </view>
+
+  <scroll-view scroll-x="true" scroll-y="true" class="table-container">
     <view class="table">
       <view class="tr header-row">
-        <view class="th fixed-col">排名</view>
-        <view class="th fixed-col-2">成员</view>
+        <view class="th fixed-col">成员</view>
         <view class="th">分组</view>
-        <view class="th">贡献</view>
+        <view class="th">贡献排名</view>
+        <view class="th">战功总量</view>
+        <view class="th">助攻总量</view>
+        <view class="th">捐献总量</view>
         <view class="th">势力值</view>
-        <view class="th">战功</view>
-        <view class="th">攻城</view>
-        <view class="th">捐献</view>
+        <view class="th">贡献总量</view>
       </view>
-      <block wx:for="{{data}}" wx:key="rank">
+      <block wx:for="{{displayData}}" wx:key="rank">
         <view class="tr {{index % 2 == 0 ? 'even' : 'odd'}}">
-          <view class="td fixed-col">{{item.rank}}</view>
-          <view class="td fixed-col-2">{{item.name}}</view>
+          <view class="td fixed-col member-link" bindtap="viewMember" data-name="{{item.name}}">{{item.name}}</view>
           <view class="td">{{item.group_name}}</view>
-          <view class="td">{{item.contribution}}</view>
-          <view class="td">{{item.power}}</view>
+          <view class="td">{{item.rank}}</view>
           <view class="td">{{item.battle_achievement}}</view>
           <view class="td">{{item.assist}}</view>
           <view class="td">{{item.donation}}</view>
+          <view class="td">{{item.power}}</view>
+          <view class="td">{{item.contribution}}</view>
         </view>
       </block>
     </view>

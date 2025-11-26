@@ -4,69 +4,97 @@ page {
 }
 
 .container {
-  padding: 20rpx;
+  padding: 16rpx;
   box-sizing: border-box;
 }
 
 .card {
   background: #fff;
   border-radius: 12rpx;
-  padding: 24rpx;
-  box-shadow: 0 6rpx 18rpx rgba(0,0,0,0.08);
-  margin-bottom: 32rpx;
+  padding: 20rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.05);
+  margin-bottom: 24rpx;
   box-sizing: border-box;
   width: 100%;
 }
 
 .title {
-  font-size: 36rpx;
+  font-size: 30rpx;
   font-weight: bold;
-  margin-bottom: 20rpx;
+  margin-bottom: 16rpx;
+  color: #333;
 }
 
 .desc {
-  font-size: 28rpx;
+  font-size: 24rpx;
   color: #666;
-  margin-bottom: 30rpx;
+  margin-bottom: 24rpx;
   line-height: 1.5;
 }
 
 .upload-btn {
-  background: #07c160;
+  background: #4ed12d;
   color: #fff;
-  font-size: 32rpx;
-  border-radius: 16rpx;
-  margin-top: 20rpx;
+  font-size: 28rpx;
+  border-radius: 12rpx;
+  margin-top: 16rpx;
+  padding: 16rpx 0;
+  line-height: 1.5;
 }
 
 .note {
-  font-size: 24rpx;
+  font-size: 22rpx;
   color: #999;
-  margin-top: 20rpx;
+  margin-top: 16rpx;
 }
 
 .section-header {
-  margin-bottom: 20rpx;
+  margin-bottom: 16rpx;
+}
+
+.alliance-name-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.alliance-name-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.alliance-name {
+  font-size: 26rpx;
+  color: #666;
+  margin-right: 8rpx;
+}
+
+.edit-icon {
+  font-size: 28rpx;
+  color: #666;
+  opacity: 0.6;
+  margin-left: 4rpx;
 }
 
 .section-title {
-  font-size: 32rpx;
+  font-size: 28rpx;
   font-weight: bold;
+  color: #333;
 }
 
 .analysis-actions {
   display: flex;
-  gap: 16rpx;
-  margin-bottom: 20rpx;
+  gap: 12rpx;
+  margin-bottom: 16rpx;
 }
 
 .analysis-btn {
   flex: 1;
-  font-size: 26rpx;
-  padding: 10rpx 0;
-  background: #07c160;
+  font-size: 24rpx;
+  padding: 8rpx 0;
+  background: #4ed12d;
   color: #fff;
-  border-radius: 10rpx;
+  border-radius: 8rpx;
   text-align: center;
   line-height: 2;
 }
@@ -77,15 +105,15 @@ page {
 }
 
 .uploads-list {
-  margin-top: 10rpx;
+  margin-top: 8rpx;
 }
 
 .upload-item {
   display: flex;
   align-items: center;
-  padding: 20rpx 10rpx;
+  padding: 16rpx 8rpx;
   border-bottom: 1rpx solid #eee;
-  font-size: 28rpx;
+  font-size: 26rpx;
 }
 
 .upload-info {
@@ -96,14 +124,14 @@ page {
 
 .upload-detail-link {
   color: #576b95;
-  padding: 10rpx;
-  margin-right: 10rpx;
-  font-size: 26rpx;
+  padding: 8rpx;
+  margin-right: 8rpx;
+  font-size: 24rpx;
 }
 
 .upload-item.is-selected {
-  background: rgba(7,193,96,0.05);
-  border-radius: 10rpx;
+  background: rgba(87,190,106,0.1);
+  border-radius: 8rpx;
 }
 
 .upload-item.is-selected .upload-text {
@@ -120,10 +148,10 @@ page {
 }
 
 .delete-btn {
-  font-size: 24rpx;
+  font-size: 22rpx;
   color: #c0392b;
   border: 1rpx solid #e5e5e5;
-  padding: 4rpx 16rpx;
-  border-radius: 8rpx;
-  margin-left: 20rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 6rpx;
+  margin-left: 16rpx;
 }

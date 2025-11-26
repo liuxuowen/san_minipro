@@ -139,7 +139,8 @@ Page({
     const index = Math.floor((hour + 1) / 2) % 12;
     const shichen = shichens[index];
     
-    return `${datePart} ${shichen}时`;
+    const [year, month, day] = datePart.split('-');
+    return `${year}年${month}月${day}日 ${shichen}时`;
   },
 
   selectGroup(e) {

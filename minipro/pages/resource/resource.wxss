@@ -1,0 +1,265 @@
+.container {
+  padding: 20rpx;
+  background: #f5f5f5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Season Header */
+.season-header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  background: #fff;
+  padding: 30rpx 30rpx;
+  border-radius: 12rpx;
+  margin-bottom: 25rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
+}
+
+.season-label {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #666;
+  margin-right: 60rpx;
+}
+
+.season-picker {
+  display: flex;
+  align-items: center;
+  font-size: 26rpx;
+  color: #4ed12d;
+  font-weight: 500;
+}
+
+.picker-arrow {
+  font-size: 20rpx;
+  margin-left: 8rpx;
+  color: #999;
+}
+
+/* Tabs */
+.tabs-container {
+  display: flex;
+  justify-content: flex-start;
+  gap: 20rpx;
+  margin-bottom: 25rpx;
+}
+
+.tab-item {
+  width: 16%; /* Approx 1/6 width */
+  min-width: 130rpx;
+  text-align: center;
+  padding: 10rpx 0;
+  font-size: 24rpx;
+  color: #666;
+  background: #fff;
+  border-radius: 8rpx;
+  box-shadow: 0 2rpx 6rpx rgba(0,0,0,0.05);
+  transition: all 0.2s;
+}
+
+.tab-item.active {
+  color: #fff;
+  background: #4ed12d;
+  font-weight: bold;
+}
+
+.tab-item.placeholder {
+  display: none;
+}
+
+/* Result Card */
+.result-card {
+  flex: 1;
+  width: 90%;
+  margin: 0 auto 30rpx auto;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.06);
+  min-height: 400rpx;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.instruction-text {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #999;
+  font-size: 26rpx;
+  line-height: 1.8;
+}
+
+.result-list {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.result-scroll {
+  flex: 1;
+  height: 0; /* Important for scroll-view in flex */
+}
+
+.result-header {
+  display: flex;
+  padding-bottom: 16rpx;
+  border-bottom: 1rpx solid #eee;
+  font-size: 28rpx;
+  color: #999;
+  font-weight: bold;
+}
+
+.result-header text {
+  flex: 1;
+  text-align: center;
+}
+
+.result-header text.col-wide {
+  flex: 1.5;
+}
+
+.result-item {
+  display: flex;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #f9f9f9;
+  font-size: 30rpx;
+  color: #333;
+}
+
+.result-item text {
+  flex: 1;
+  text-align: center;
+}
+
+.result-item text.col-wide {
+  flex: 1.5;
+}
+
+.highlight {
+  color: #e64340;
+  font-weight: bold;
+}
+
+.no-result {
+  text-align: center;
+  color: #999;
+  font-size: 26rpx;
+  padding: 40rpx 0;
+}
+
+.loading-tip {
+  text-align: center;
+  font-size: 24rpx;
+  color: #999;
+  margin: 40rpx 0;
+}
+
+/* Bottom Controls */
+.bottom-controls {
+  width: 90%;
+  margin: 0 auto 20rpx auto;
+  background: #fff;
+  padding: 20rpx 30rpx;
+  border-radius: 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.05);
+}
+
+.batch-btn-wrapper {
+  padding: 16rpx 0 0 0;
+  display: flex;
+  justify-content: center;
+  border-top: 1rpx solid #f5f5f5;
+}
+
+.batch-btn {
+  font-size: 24rpx;
+  color: #666;
+  background: #f0f0f0;
+  border-radius: 30rpx;
+  padding: 0 40rpx;
+  line-height: 56rpx;
+  height: 56rpx;
+  border: none;
+}
+
+.batch-btn::after {
+  border: none;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.input-row {
+  display: flex;
+  gap: 20rpx;
+}
+
+.mini-input {
+  flex: 1;
+  height: 72rpx;
+  background: #f8f8f8;
+  border-radius: 8rpx;
+  padding: 0 20rpx;
+  font-size: 26rpx;
+  text-align: center;
+}
+
+.action-row {
+  display: flex;
+  gap: 20rpx;
+  align-items: center;
+}
+
+.mini-picker {
+  flex: 1;
+  height: 72rpx;
+  background: #f8f8f8;
+  border-radius: 8rpx;
+}
+
+.picker-inner {
+  height: 72rpx;
+  line-height: 72rpx;
+  padding: 0 20rpx;
+  font-size: 26rpx;
+  color: #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.arrow {
+  font-size: 20rpx;
+  color: #999;
+}
+
+.mini-btn {
+  height: 72rpx;
+  line-height: 72rpx;
+  background: #4ed12d;
+  color: #fff;
+  font-size: 26rpx;
+  border-radius: 8rpx;
+  padding: 0 40rpx;
+  margin: 0;
+  font-weight: bold;
+}
+
+.mini-btn.full-width {
+  width: 100%;
+}
+
+.action-row.single-btn {
+  width: 100%;
+}

@@ -36,8 +36,43 @@
     width: 200rpx;
 }
 
-.usermotto {
-  margin-top: 100px;
+.info-section {
+  width: 90%;
+  margin-top: 60rpx;
+  background: #fff;
+  border-radius: 12rpx;
+  padding: 0 20rpx;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx 0;
+  border-bottom: 1rpx solid #eee;
+  font-size: 30rpx;
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.label {
+  color: #333;
+}
+
+.picker-value, .input-value {
+  color: #666;
+  text-align: right;
+}
+
+.input-value {
+  width: 300rpx;
+}
+
+.arrow {
+  color: #ccc;
+  margin-left: 10rpx;
 }
 
 .footer {

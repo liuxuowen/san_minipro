@@ -9,9 +9,20 @@
     <!-- value 绑定 userInfo.nickName 以便回显 -->
     <input type="nickname" class="nickname-input" placeholder="请输入昵称" value="{{userInfo.nickName}}" bind:change="onInputChange"/>
   </view>
-  
-  <view class="usermotto">
-    <text class="user-motto">{{motto}}</text>
+
+  <view class="info-section">
+    <view class="info-item">
+      <text class="label">当前赛季</text>
+      <picker bindchange="bindSeasonChange" value="{{seasonIndex}}" range="{{seasons}}">
+        <view class="picker-value">
+          {{seasons[seasonIndex] || userInfo.season || '选择赛季'}} <text class="arrow">></text>
+        </view>
+      </picker>
+    </view>
+    <view class="info-item">
+      <text class="label">所属同盟</text>
+      <input class="input-value" placeholder="请输入同盟名称" value="{{userInfo.allianceName}}" bindinput="onAllianceInput" bindblur="saveAlliance" maxlength="6"/>
+    </view>
   </view>
 
   <view class="footer">

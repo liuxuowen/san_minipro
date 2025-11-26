@@ -3,6 +3,7 @@
     "pages/alliance/alliance",
     "pages/alliance/analysis/analysis",
     "pages/alliance/detail/detail",
+    "pages/alliance/member/member",
     "pages/resource/resource",
     "pages/battle/battle",
     "pages/profile/profile"

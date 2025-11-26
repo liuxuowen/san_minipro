@@ -3,17 +3,96 @@ const defaultAvatarUrl = '/static/icons/default.png'
 
 Page({
   data: {
-    motto: '欢迎来到个人中心',
     userInfo: {
       avatarUrl: defaultAvatarUrl,
       nickName: '',
+      season: 'S1',
+      allianceName: ''
     },
     hasUserInfo: false,
     openid: '正在获取...',
-    defaultAvatarUrl: defaultAvatarUrl
+    defaultAvatarUrl: defaultAvatarUrl,
+    seasons: [],
+    seasonIndex: 0
   },
   onLoad() {
     this.getOpenId();
+    this.fetchSeasons();
+  },
+  fetchSeasons() {
+    wx.request({
+      url: `${app.globalData.apiBaseUrl}/api/resource/seasons`,
+      success: (res) => {
+        if (res.data.seasons) {
+          this.setData({ seasons: res.data.seasons });
+          this.syncSeasonIndex();
+        }
+      }
+    });
+  },
+  syncSeasonIndex() {
+    const { seasons, userInfo } = this.data;
+    if (seasons.length > 0 && userInfo.season) {
+      const index = seasons.indexOf(userInfo.season);
+      if (index > -1) {
+        this.setData({ seasonIndex: index });
+      }
+    }
+  },
+  bindSeasonChange(e) {
+    const index = e.detail.value;
+    const season = this.data.seasons[index];
+    this.setData({
+      seasonIndex: index,
+      'userInfo.season': season
+    });
+    this.updateUserSeason(season);
+  },
+  updateUserSeason(season) {
+    const openid = wx.getStorageSync('openid');
+    if (!openid) return;
+
+    wx.request({
+      url: `${app.globalData.apiBaseUrl}/api/user/season`,
+      method: 'POST',
+      data: { openid, season },
+      success: (res) => {
+        if (res.data.success) {
+          this.updateLocalUserInfo({ season });
+        }
+      }
+    });
+  },
+  onAllianceInput(e) {
+    this.setData({
+      'userInfo.allianceName': e.detail.value
+    });
+  },
+  saveAlliance() {
+    const { allianceName } = this.data.userInfo;
+    const openid = wx.getStorageSync('openid');
+    
+    if (!openid) return;
+    if (!allianceName) return;
+
+    wx.request({
+      url: `${app.globalData.apiBaseUrl}/api/user/alliance`,
+      method: 'POST',
+      data: { openid, alliance_name: allianceName },
+      success: (res) => {
+        if (res.data.success) {
+          this.updateLocalUserInfo({ alliance_name: allianceName });
+          wx.showToast({ title: '保存成功', icon: 'success' });
+        } else {
+          wx.showToast({ title: res.data.error || '保存失败', icon: 'none' });
+        }
+      }
+    });
+  },
+  updateLocalUserInfo(data) {
+    const userInfo = wx.getStorageSync('userInfo') || {};
+    Object.assign(userInfo, data);
+    wx.setStorageSync('userInfo', userInfo);
   },
   getOpenId() {
     wx.login({
@@ -31,10 +110,16 @@ Page({
                 const updateData = {
                   openid: res.data.openid
                 }
+                
+                // 保存 openid 到本地存储
+                wx.setStorageSync('openid', res.data.openid);
 
                 // 自动加载后端返回的用户信息
                 if (res.data.user) {
-                    const { nickname, avatar_url } = res.data.user
+                    // 保存用户信息到本地存储
+                    wx.setStorageSync('userInfo', res.data.user);
+                    
+                    const { nickname, avatar_url, season, alliance_name } = res.data.user
                     const userInfo = this.data.userInfo
                     
                     if (nickname) {
@@ -44,7 +129,16 @@ Page({
                     if (avatar_url) {
                         userInfo.avatarUrl = avatar_url
                     }
+                    if (season) {
+                        userInfo.season = season
+                    }
+                    if (alliance_name) {
+                        userInfo.allianceName = alliance_name
+                    }
                     updateData.userInfo = userInfo
+                    
+                    // Sync season index after getting user info
+                    setTimeout(() => this.syncSeasonIndex(), 100);
                 }
 
                 this.setData(updateData)

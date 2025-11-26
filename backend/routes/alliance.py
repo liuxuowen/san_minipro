@@ -11,7 +11,13 @@ alliance_bp = Blueprint('alliance', __name__)
 
 @alliance_bp.route('/api/alliance/uploads', methods=['GET'])
 def get_uploads():
-    uploads = UploadRecord.query.order_by(UploadRecord.upload_time.desc()).all()
+    openid = request.args.get('openid')
+    query = UploadRecord.query
+    
+    if openid:
+        query = query.filter_by(user_id=openid)
+        
+    uploads = query.order_by(UploadRecord.upload_time.desc()).all()
     return jsonify({
         'uploads': [u.to_dict() for u in uploads]
     })
@@ -71,14 +77,24 @@ def upload_file():
         except ValueError:
             pass
 
+    # 获取 openid
+    openid = request.form.get('openid')
+
     # 去重逻辑：
     # 1. 如果解析出了 stats_time，则检查数据库中是否存在相同 stats_time 的记录
     # 2. 如果没有解析出 stats_time，则退化为检查 filename
+    # 3. 必须是同一个用户的记录才算重复
     existing_record = None
     if stats_time:
-        existing_record = UploadRecord.query.filter_by(stats_time=stats_time).first()
+        query = UploadRecord.query.filter_by(stats_time=stats_time)
+        if openid:
+            query = query.filter_by(user_id=openid)
+        existing_record = query.first()
     else:
-        existing_record = UploadRecord.query.filter_by(filename=original_filename).first()
+        query = UploadRecord.query.filter_by(filename=original_filename)
+        if openid:
+            query = query.filter_by(user_id=openid)
+        existing_record = query.first()
 
     if existing_record:
         return jsonify({'success': True, 'message': 'File already exists (duplicate timestamp), skipped.', 'skipped': True})
@@ -168,7 +184,8 @@ def upload_file():
             record = UploadRecord(
                 filename=original_filename,
                 member_count=member_count,
-                stats_time=stats_time
+                stats_time=stats_time,
+                user_id=openid
             )
             db.session.add(record)
             db.session.flush() # 获取 record.id
@@ -337,4 +354,37 @@ def compare_uploads():
 def get_image(filename):
     output_dir = os.path.join(current_app.root_path, 'static', 'generated')
     return send_from_directory(output_dir, filename)
+
+
+@alliance_bp.route('/api/alliance/member/history', methods=['GET'])
+def get_member_history():
+    name = request.args.get('name')
+    if not name:
+        return jsonify({'success': False, 'message': 'Name is required'})
+    
+    results = db.session.query(AllianceData, UploadRecord).join(
+        UploadRecord, AllianceData.upload_id == UploadRecord.id
+    ).filter(
+        AllianceData.name == name
+    ).order_by(
+        UploadRecord.stats_time.asc()
+    ).all()
+    
+    history = []
+    for data, record in results:
+        history.append({
+            'ts': record.stats_time.strftime('%Y-%m-%d %H:%M:%S') if record.stats_time else record.upload_time.strftime('%Y-%m-%d %H:%M:%S'),
+            'display_time': record.to_dict()['display_time'],
+            'battle': data.battle_achievement,
+            'power': data.power,
+            'assist': data.assist,
+            'donation': data.donation
+        })
+        
+    return jsonify({
+        'success': True,
+        'name': name,
+        'count': len(history),
+        'history': history
+    })
 
