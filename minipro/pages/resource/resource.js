@@ -32,6 +32,10 @@ Page({
     this.loadUserSeason();
   },
 
+  onShow() {
+    this.loadUserSeason();
+  },
+
   fetchSeasons() {
     wx.request({
       url: `${app.globalData.apiBaseUrl}/api/resource/seasons`,

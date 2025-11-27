@@ -1,3 +1,31 @@
 <view class="container">
-  <text>{{text}}</text>
+  <view class="header">
+    <text class="title">战功识别</text>
+    <text class="subtitle">上传截图自动识别战功数值</text>
+  </view>
+
+  <view class="image-grid">
+    <view class="image-item" wx:for="{{images}}" wx:key="tempFilePath">
+      <image class="thumb" src="{{item.tempFilePath}}" mode="aspectFill" bindtap="previewImage" data-url="{{item.tempFilePath}}"></image>
+      
+      <!-- Delete Button -->
+      <view class="delete-btn" catchtap="deleteImage" data-index="{{index}}">×</view>
+      
+      <!-- Status/Result Overlay -->
+      <view class="overlay {{item.status}}">
+        <block wx:if="{{item.status === 'pending'}}">待识别</block>
+        <block wx:elif="{{item.status === 'uploading'}}">识别中...</block>
+        <block wx:elif="{{item.status === 'success'}}">
+          <text class="result-num">+{{item.result}}</text>
+        </block>
+        <block wx:elif="{{item.status === 'fail'}}">失败</block>
+      </view>
+    </view>
+
+    <!-- Add Button -->
+    <view class="add-btn" bindtap="chooseImages">
+      <text class="plus">+</text>
+      <text class="add-text">添加图片</text>
+    </view>
+  </view>
 </view>

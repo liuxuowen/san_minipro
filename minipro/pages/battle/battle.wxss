@@ -1,0 +1,154 @@
+.container {
+  padding: 20rpx;
+  padding-bottom: 120rpx; /* Space for footer */
+  background-color: #f7f7f7;
+  min-height: 100vh;
+}
+
+.header {
+  padding: 20rpx 0;
+  margin-bottom: 20rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.subtitle {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.image-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20rpx;
+}
+
+.image-item {
+  width: 220rpx;
+  height: 220rpx;
+  position: relative;
+  border-radius: 12rpx;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.05);
+}
+
+.thumb {
+  width: 100%;
+  height: 100%;
+}
+
+.delete-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40rpx;
+  height: 40rpx;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  text-align: center;
+  line-height: 40rpx;
+  border-bottom-left-radius: 12rpx;
+  font-size: 28rpx;
+  z-index: 10;
+}
+
+.overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50rpx;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  font-size: 22rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay.success {
+  background: rgba(78, 209, 45, 0.9);
+}
+
+.overlay.fail {
+  background: rgba(230, 67, 64, 0.9);
+}
+
+.result-num {
+  font-weight: bold;
+  font-size: 26rpx;
+}
+
+.add-btn {
+  width: 220rpx;
+  height: 220rpx;
+  background: #fff;
+  border: 2rpx dashed #ddd;
+  border-radius: 12rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+}
+
+.plus {
+  font-size: 60rpx;
+  font-weight: 300;
+  margin-bottom: 10rpx;
+}
+
+.add-text {
+  font-size: 24rpx;
+}
+
+.footer-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100rpx;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  padding: 0 30rpx;
+  box-shadow: 0 -2rpx 10rpx rgba(0,0,0,0.05);
+  box-sizing: border-box;
+  z-index: 100;
+}
+
+.total-info {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.total-num {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #e64340;
+  margin-left: 10rpx;
+}
+
+.action-btn {
+  background: #4ed12d;
+  color: #fff;
+  font-size: 28rpx;
+  padding: 0 40rpx;
+  height: 70rpx;
+  line-height: 70rpx;
+  border-radius: 35rpx;
+  margin: 0;
+}
+
+.action-btn[disabled] {
+  background: #ccc;
+  color: #fff;
+}

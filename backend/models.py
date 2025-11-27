@@ -11,6 +11,13 @@ class User(db.Model):
     login_count = db.Column(db.Integer, default=1)
     alliance_name = db.Column(db.String(6), nullable=True)
     season = db.Column(db.String(64), default='S1')
+    
+    # New OCR fields
+    role_name = db.Column(db.String(64), nullable=True)
+    role_id = db.Column(db.String(64), nullable=True)
+    server_info = db.Column(db.String(64), nullable=True)
+    zone = db.Column(db.String(64), nullable=True)
+    team_name = db.Column(db.String(64), nullable=True)
 
     def to_dict(self):
         return {
@@ -21,7 +28,12 @@ class User(db.Model):
             'last_login_time': self.last_login_time.isoformat(),
             'login_count': self.login_count,
             'alliance_name': self.alliance_name,
-            'season': self.season
+            'season': self.season,
+            'role_name': self.role_name,
+            'role_id': self.role_id,
+            'server_info': self.server_info,
+            'zone': self.zone,
+            'team_name': self.team_name
         }
 
 class UploadRecord(db.Model):
@@ -118,4 +130,25 @@ class ResourcePoint(db.Model):
             'level': self.level,
             'x': self.x,
             'y': self.y
+        }
+
+class BattleMerit(db.Model):
+    __tablename__ = 'battle_merits'
+    id = db.Column(db.Integer, primary_key=True)
+    openid = db.Column(db.String(64), db.ForeignKey('users.openid'), nullable=False)
+    submit_time = db.Column(db.DateTime, default=datetime.now)
+    merit_value = db.Column(db.Integer, nullable=False)
+    image_filename = db.Column(db.String(256), nullable=False)
+    image_create_time = db.Column(db.DateTime, nullable=True)
+    file_md5 = db.Column(db.String(32), nullable=True)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'openid': self.openid,
+            'submit_time': self.submit_time.isoformat(),
+            'merit_value': self.merit_value,
+            'image_filename': self.image_filename,
+            'image_create_time': self.image_create_time.isoformat() if self.image_create_time else None,
+            'file_md5': self.file_md5
         }

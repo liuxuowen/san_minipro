@@ -1,4 +1,9 @@
 <view class="container">
+  <!-- Scan Link (Top Right) -->
+  <view class="scan-link" bindtap="scanProfile">
+    <text>上传主公基础设置界面</text>
+  </view>
+
   <view class="userinfo">
     <!-- 始终允许点击头像进行修改 -->
     <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
@@ -11,6 +16,7 @@
   </view>
 
   <view class="info-section">
+    <!-- 可编辑部分 -->
     <view class="info-item">
       <text class="label">当前赛季</text>
       <picker bindchange="bindSeasonChange" value="{{seasonIndex}}" range="{{seasons}}">
@@ -22,6 +28,28 @@
     <view class="info-item">
       <text class="label">所属同盟</text>
       <input class="input-value" placeholder="请输入同盟名称" value="{{userInfo.allianceName}}" bindinput="onAllianceInput" bindblur="saveAlliance" maxlength="6"/>
+    </view>
+    <view class="info-item">
+      <text class="label">角色名称</text>
+      <input class="input-value" placeholder="请输入角色名称" value="{{userInfo.roleName}}" data-field="roleName" bindinput="onOcrFieldInput" bindblur="saveOcrInfo"/>
+    </view>
+
+    <!-- 不可编辑部分 -->
+    <view class="info-item">
+      <text class="label">角色编号</text>
+      <input class="input-value disabled-input" placeholder="未识别" value="{{userInfo.roleId}}" data-field="roleId" bindinput="onOcrFieldInput" bindblur="saveOcrInfo" disabled="true"/>
+    </view>
+    <view class="info-item">
+      <text class="label">服务器</text>
+      <input class="input-value disabled-input" placeholder="未识别" value="{{userInfo.serverInfo}}" data-field="serverInfo" bindinput="onOcrFieldInput" bindblur="saveOcrInfo" disabled="true"/>
+    </view>
+    <view class="info-item">
+      <text class="label">赛区</text>
+      <input class="input-value disabled-input" placeholder="未识别" value="{{userInfo.zone}}" data-field="zone" bindinput="onOcrFieldInput" bindblur="saveOcrInfo" disabled="true"/>
+    </view>
+    <view class="info-item">
+      <text class="label">队伍</text>
+      <input class="input-value disabled-input" placeholder="未识别" value="{{userInfo.teamName}}" data-field="teamName" bindinput="onOcrFieldInput" bindblur="saveOcrInfo" disabled="true"/>
     </view>
   </view>
 

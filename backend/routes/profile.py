@@ -149,3 +149,29 @@ def update_season():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
+@profile_bp.route('/api/user/ocr_info', methods=['POST'])
+def update_ocr_info():
+    data = request.json
+    openid = data.get('openid')
+    
+    if not openid:
+        return jsonify({'error': 'Missing openid'}), 400
+        
+    user = User.query.get(openid)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+        
+    # Update fields if present
+    if 'role_name' in data: user.role_name = data['role_name']
+    if 'role_id' in data: user.role_id = data['role_id']
+    if 'server_info' in data: user.server_info = data['server_info']
+    if 'zone' in data: user.zone = data['zone']
+    if 'team_name' in data: user.team_name = data['team_name']
+    
+    try:
+        db.session.commit()
+        return jsonify({'success': True, 'user': user.to_dict()})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
