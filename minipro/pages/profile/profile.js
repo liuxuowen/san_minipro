@@ -28,6 +28,11 @@ Page({
       const currentInfo = this.data.userInfo;
       const newInfo = { ...currentInfo, ...userInfo };
       
+      // Fix legacy avatar URL if it contains old IP
+      if (newInfo.avatarUrl) {
+        newInfo.avatarUrl = this.fixAvatarUrl(newInfo.avatarUrl);
+      }
+
       // Map backend fields to frontend fields if needed
       if (userInfo.alliance_name) newInfo.allianceName = userInfo.alliance_name;
       if (userInfo.role_name) newInfo.roleName = userInfo.role_name;
@@ -43,6 +48,11 @@ Page({
       
       this.syncSeasonIndex();
     }
+  },
+  fixAvatarUrl(url) {
+    if (!url) return url;
+    // Replace old IP address with new domain
+    return url.replace('http://101.201.106.39:5000', 'https://youlao.xin');
   },
   scanProfile() {
     wx.chooseMedia({

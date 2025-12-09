@@ -1,4 +1,13 @@
 /**app.wxss**/
+page {
+  font-family: "Source Han Sans", "Source Han Sans CN", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+/* 定义数字专用字体类，需要时在元素上添加 class="num-font" */
+.num-font {
+  font-family: "DIN", "DIN Alternate", "Helvetica Neue", Helvetica, sans-serif;
+}
+
 .container {
   height: 100%;
   display: flex;

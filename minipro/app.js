@@ -8,7 +8,7 @@ App({
   globalData: {
     userInfo: null,
     // 本地调试: http://127.0.0.1:5000
-    // 远程服务器: http://101.201.106.39:5000
-    apiBaseUrl: 'http://101.201.106.39:5000' 
+    // 远程服务器: https://youlao.xin
+    apiBaseUrl: 'https://youlao.xin'  
   }
 })

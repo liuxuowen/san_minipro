@@ -37,19 +37,19 @@
     <!-- 不可编辑部分 -->
     <view class="info-item">
       <text class="label">角色编号</text>
-      <input class="input-value disabled-input" placeholder="未识别" value="{{userInfo.roleId}}" data-field="roleId" bindinput="onOcrFieldInput" bindblur="saveOcrInfo" disabled="true"/>
+      <input class="input-value disabled-input num-font" placeholder="未识别" value="{{userInfo.roleId}}" data-field="roleId" bindinput="onOcrFieldInput" bindblur="saveOcrInfo" disabled="true"/>
     </view>
     <view class="info-item">
       <text class="label">服务器</text>
-      <input class="input-value disabled-input" placeholder="未识别" value="{{userInfo.serverInfo}}" data-field="serverInfo" bindinput="onOcrFieldInput" bindblur="saveOcrInfo" disabled="true"/>
+      <input class="input-value disabled-input num-font" placeholder="未识别" value="{{userInfo.serverInfo}}" data-field="serverInfo" bindinput="onOcrFieldInput" bindblur="saveOcrInfo" disabled="true"/>
     </view>
     <view class="info-item">
       <text class="label">赛区</text>
-      <input class="input-value disabled-input" placeholder="未识别" value="{{userInfo.zone}}" data-field="zone" bindinput="onOcrFieldInput" bindblur="saveOcrInfo" disabled="true"/>
+      <input class="input-value disabled-input num-font" placeholder="未识别" value="{{userInfo.zone}}" data-field="zone" bindinput="onOcrFieldInput" bindblur="saveOcrInfo" disabled="true"/>
     </view>
     <view class="info-item">
       <text class="label">队伍</text>
-      <input class="input-value disabled-input" placeholder="未识别" value="{{userInfo.teamName}}" data-field="teamName" bindinput="onOcrFieldInput" bindblur="saveOcrInfo" disabled="true"/>
+      <input class="input-value disabled-input num-font" placeholder="未识别" value="{{userInfo.teamName}}" data-field="teamName" bindinput="onOcrFieldInput" bindblur="saveOcrInfo" disabled="true"/>
     </view>
   </view>
 

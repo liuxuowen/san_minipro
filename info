@@ -1,3 +1,5 @@
 ip 101.201.106.39
-pem /Users/liuxu/liuxu.pem
+youlao.xin
 
+scp -i C:\Users\liuxu\Documents\liuxu.pem D:\git\san_minipro\backend\ssl\* root@101.201.106.39:/etc/nginx/ssl/
+pem /Users/liuxu/liuxu.pem
