@@ -1,5 +1,5 @@
 const app = getApp()
-const defaultAvatarUrl = '/static/icons/default.png'
+const defaultAvatarUrl = '/static/profile/default.png'
 
 Page({
   data: {
@@ -13,7 +13,8 @@ Page({
     openid: '正在获取...',
     defaultAvatarUrl: defaultAvatarUrl,
     seasons: [],
-    seasonIndex: 0
+    seasonIndex: 0,
+    highlightFields: {}
   },
   onLoad() {
     this.getOpenId();
@@ -54,6 +55,12 @@ Page({
     // Replace old IP address with new domain
     return url.replace('http://101.201.106.39:5000', 'https://youlao.xin');
   },
+
+  fixAvatarUrl(url) {
+    if (!url) return url;
+    // Replace old IP address with new domain
+    return url.replace('http://101.201.106.39:5000', 'https://youlao.xin');
+  },
   scanProfile() {
     wx.chooseMedia({
       count: 1,
@@ -61,39 +68,106 @@ Page({
       sourceType: ['album', 'camera'],
       success: (res) => {
         const tempFilePath = res.tempFiles[0].tempFilePath;
-        wx.showLoading({ title: '识别中...' });
+        console.log('[Profile OCR] Selected image path:', tempFilePath);
         
-        const fs = wx.getFileSystemManager();
-        fs.readFile({
+        // 检查文件大小
+        wx.getFileInfo({
           filePath: tempFilePath,
-          encoding: 'base64',
-          success: (readRes) => {
-            wx.serviceMarket.invokeService({
-              service: 'wx79ac3de8be320b71',
-              api: 'OcrAllInOne',
-              data: {
-                img_data: readRes.data,
-                data_type: 2,
-                ocr_type: 8
+          success: (fileInfo) => {
+            const fileSizeMB = (fileInfo.size / 1024 / 1024).toFixed(2);
+            console.log('[Profile OCR] File size:', fileSizeMB, 'MB');
+            
+            if (fileInfo.size > 4 * 1024 * 1024) {
+              wx.showModal({
+                title: '图片过大',
+                content: `图片大小为 ${fileSizeMB}MB，超过4MB限制，请重新选择`,
+                showCancel: false
+              });
+              return;
+            }
+            
+            wx.showLoading({ title: '识别中...' });
+            
+            // 读取图片为base64
+            const fs = wx.getFileSystemManager();
+            fs.readFile({
+              filePath: tempFilePath,
+              encoding: 'base64',
+              success: (readRes) => {
+                const base64Data = readRes.data;
+                console.log('[Profile OCR] Sending to backend...');
+                
+                // 调用后端OCR接口
+                wx.request({
+                  url: app.globalData.apiBaseUrl + '/api/ocr/profile',
+                  method: 'POST',
+                  data: {
+                    image: base64Data
+                  },
+                  success: (ocrRes) => {
+                    wx.hideLoading();
+                    console.log('[Backend OCR] Response:', ocrRes.data);
+                    
+                    if (ocrRes.data.success && ocrRes.data.parsed) {
+                      // 使用解析后的数据
+                      const parsed = ocrRes.data.parsed;
+                      
+                      this.setData({
+                        'userInfo.roleId': parsed.roleId || this.data.userInfo.roleId,
+                        'userInfo.roleName': parsed.roleName || this.data.userInfo.roleName,
+                        'userInfo.allianceName': parsed.allianceName || this.data.userInfo.allianceName,
+                        'userInfo.zone': parsed.zone || this.data.userInfo.zone,
+                        'userInfo.serverInfo': parsed.serverInfo || this.data.userInfo.serverInfo,
+                        'userInfo.teamName': parsed.teamName || this.data.userInfo.teamName
+                      });
+                      
+                      // 高亮显示识别的字段
+                      const highlightFields = {};
+                      Object.keys(parsed).forEach(key => {
+                        if (parsed[key]) highlightFields[key] = true;
+                      });
+                      this.setData({ highlightFields });
+                      
+                      wx.showToast({ 
+                        title: '识别成功！', 
+                        icon: 'success',
+                        duration: 2000
+                      });
+                      
+                      // 延迟清除高亮
+                      setTimeout(() => {
+                        this.setData({ highlightFields: {} });
+                      }, 3000);
+                    } else {
+                      console.error('[Backend OCR] Invalid response:', ocrRes.data);
+                      wx.showToast({ 
+                        title: ocrRes.data.error || '识别失败，请重试', 
+                        icon: 'none',
+                        duration: 2000
+                      });
+                    }
+                  },
+                  fail: (err) => {
+                    wx.hideLoading();
+                    console.error('[Backend OCR] Request failed:', err);
+                    wx.showModal({
+                      title: '网络错误',
+                      content: '无法连接服务器，请检查网络',
+                      showCancel: false
+                    });
+                  }
+                });
               },
-              success: (ocrRes) => {
+              fail: (readErr) => {
                 wx.hideLoading();
-                if (ocrRes.errMsg === 'invokeService:ok' && ocrRes.data && ocrRes.data.ocr_comm_res) {
-                  this.parseAndSaveProfile(ocrRes.data.ocr_comm_res.items);
-                } else {
-                  wx.showToast({ title: '识别失败', icon: 'none' });
-                }
-              },
-              fail: (err) => {
-                wx.hideLoading();
-                console.error(err);
-                wx.showToast({ title: '调用OCR失败', icon: 'none' });
+                console.error('[Profile OCR] Read file failed:', readErr);
+                wx.showToast({ title: '读取文件失败', icon: 'none' });
               }
             });
           },
-          fail: () => {
-            wx.hideLoading();
-            wx.showToast({ title: '读取文件失败', icon: 'none' });
+          fail: (err) => {
+            console.error('[Profile OCR] Get file info failed:', err);
+            wx.showToast({ title: '获取文件信息失败', icon: 'none' });
           }
         });
       }
@@ -164,6 +238,39 @@ Page({
 
     // Directly save and update UI, no modal confirmation needed as user can edit
     this.saveProfileToServer(result);
+    
+    // Trigger highlight animation for recognized fields
+    this.triggerHighlight(Object.keys(result));
+  },
+  triggerHighlight(fields) {
+    // Reset highlights first
+    this.setData({ highlightFields: {} });
+    
+    // Set highlight for recognized fields
+    const highlights = {};
+    fields.forEach(field => {
+        // Map backend keys to frontend keys if necessary, or use same keys
+        // Our data keys are: role_name -> roleName, role_id -> roleId, etc.
+        // But here we need to match the wxml data binding or class logic
+        // Let's use a mapping
+        const keyMap = {
+            'role_name': 'roleName',
+            'role_id': 'roleId',
+            'server_info': 'serverInfo',
+            'zone': 'zone',
+            'team_name': 'teamName'
+        };
+        if (keyMap[field]) {
+            highlights[keyMap[field]] = true;
+        }
+    });
+    
+    this.setData({ highlightFields: highlights });
+
+    // Remove highlight after 2 seconds (animation duration)
+    setTimeout(() => {
+        this.setData({ highlightFields: {} });
+    }, 2000);
   },
   saveProfileToServer(data) {
     const openid = wx.getStorageSync('openid');

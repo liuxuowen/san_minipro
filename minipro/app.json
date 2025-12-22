@@ -22,26 +22,26 @@
       {
         "pagePath": "pages/alliance/alliance",
         "text": "同盟管理",
-        "iconPath": "static/icons/alliance_un.png",
-        "selectedIconPath": "static/icons/alliance.png"
+        "iconPath": "static/alliance_un.png",
+        "selectedIconPath": "static/alliance.png"
       },
       {
         "pagePath": "pages/resource/resource",
         "text": "资源州铜",
-        "iconPath": "static/icons/resource_un.png",
-        "selectedIconPath": "static/icons/resource.png"
+        "iconPath": "static/resource_un.png",
+        "selectedIconPath": "static/resource.png"
       },
       {
         "pagePath": "pages/battle/battle",
         "text": "战功识别",
-        "iconPath": "static/icons/battle_un.png",
-        "selectedIconPath": "static/icons/battle.png"
+        "iconPath": "static/battle_un.png",
+        "selectedIconPath": "static/battle.png"
       },
       {
         "pagePath": "pages/profile/profile",
         "text": "个人中心",
-        "iconPath": "static/icons/profile_un.png",
-        "selectedIconPath": "static/icons/profile.png"
+        "iconPath": "static/profile_un.png",
+        "selectedIconPath": "static/profile.png"
       }
     ]
   },

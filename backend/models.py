@@ -152,3 +152,40 @@ class BattleMerit(db.Model):
             'image_create_time': self.image_create_time.isoformat() if self.image_create_time else None,
             'file_md5': self.file_md5
         }
+
+class Alliance(db.Model):
+    __tablename__ = 'alliances'
+    alliance_id = db.Column(db.String(10), primary_key=True)
+    alliance_name = db.Column(db.String(64), nullable=False)
+    zone = db.Column(db.String(64), nullable=False)
+    server_info = db.Column(db.String(64), nullable=False)
+    creator_openid = db.Column(db.String(64), db.ForeignKey('users.openid'), nullable=False)
+    create_time = db.Column(db.DateTime, default=datetime.now)
+
+    def to_dict(self):
+        return {
+            'alliance_id': self.alliance_id,
+            'alliance_name': self.alliance_name,
+            'zone': self.zone,
+            'server_info': self.server_info,
+            'creator_openid': self.creator_openid,
+            'create_time': self.create_time.isoformat()
+        }
+
+class AllianceMember(db.Model):
+    __tablename__ = 'alliance_members'
+    id = db.Column(db.Integer, primary_key=True)
+    alliance_id = db.Column(db.String(10), db.ForeignKey('alliances.alliance_id'), nullable=False)
+    openid = db.Column(db.String(64), db.ForeignKey('users.openid'), nullable=False)
+    join_time = db.Column(db.DateTime, default=datetime.now)
+    
+    # Composite unique constraint to prevent duplicate memberships
+    __table_args__ = (db.UniqueConstraint('alliance_id', 'openid', name='_alliance_member_uc'),)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'alliance_id': self.alliance_id,
+            'openid': self.openid,
+            'join_time': self.join_time.isoformat()
+        }

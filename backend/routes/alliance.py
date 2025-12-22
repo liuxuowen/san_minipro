@@ -1,23 +1,51 @@
 from flask import Blueprint, request, jsonify, current_app, send_from_directory
 from extensions import db
-from models import UploadRecord, AllianceData
+from models import UploadRecord, AllianceData, User, Alliance, AllianceMember
 from utils.image_generator import ImageGenerator
 import os
 from datetime import datetime
 import re
 import csv
+import hashlib
 
 alliance_bp = Blueprint('alliance', __name__)
 
 @alliance_bp.route('/api/alliance/uploads', methods=['GET'])
 def get_uploads():
     openid = request.args.get('openid')
-    query = UploadRecord.query
     
-    if openid:
-        query = query.filter_by(user_id=openid)
-        
-    uploads = query.order_by(UploadRecord.upload_time.desc()).all()
+    if not openid:
+        uploads = UploadRecord.query.order_by(UploadRecord.upload_time.desc()).all()
+        return jsonify({
+            'uploads': [u.to_dict() for u in uploads]
+        })
+    
+    # Get user's alliance
+    user = User.query.get(openid)
+    if not user or not user.alliance_name:
+        # User has no alliance, return empty list
+        return jsonify({'uploads': []})
+    
+    # Find the alliance
+    alliance = Alliance.query.filter_by(
+        alliance_name=user.alliance_name,
+        zone=user.zone,
+        server_info=user.server_info
+    ).first()
+    
+    if not alliance:
+        return jsonify({'uploads': []})
+    
+    # Get all members of this alliance
+    members = AllianceMember.query.filter_by(alliance_id=alliance.alliance_id).all()
+    member_openids = [m.openid for m in members]
+    
+    # Get uploads from all alliance members (primarily the creator)
+    # In practice, only creators upload, but this allows flexibility
+    uploads = UploadRecord.query.filter(
+        UploadRecord.user_id.in_(member_openids)
+    ).order_by(UploadRecord.upload_time.desc()).all()
+    
     return jsonify({
         'uploads': [u.to_dict() for u in uploads]
     })
@@ -386,5 +414,140 @@ def get_member_history():
         'name': name,
         'count': len(history),
         'history': history
+    })
+
+@alliance_bp.route('/api/alliance/info', methods=['GET'])
+def get_alliance_info():
+    openid = request.args.get('openid')
+    if not openid:
+        return jsonify({'success': False, 'error': '缺少openid参数'})
+    
+    user = User.query.get(openid)
+    if not user or not user.alliance_name:
+        return jsonify({'success': False, 'has_alliance': False})
+    
+    # Find alliance by name, zone, and server_info
+    alliance = Alliance.query.filter_by(
+        alliance_name=user.alliance_name,
+        zone=user.zone,
+        server_info=user.server_info
+    ).first()
+    
+    if not alliance:
+        return jsonify({'success': False, 'has_alliance': False})
+    
+    is_creator = (alliance.creator_openid == openid)
+    
+    return jsonify({
+        'success': True,
+        'has_alliance': True,
+        'is_creator': is_creator,
+        'alliance_id': alliance.alliance_id,
+        'alliance_name': alliance.alliance_name
+    })
+
+@alliance_bp.route('/api/alliance/create', methods=['POST'])
+def create_alliance():
+    data = request.json
+    openid = data.get('openid')
+    alliance_name = data.get('alliance_name')
+    
+    if not openid or not alliance_name:
+        return jsonify({'success': False, 'error': '缺少必要参数'})
+    
+    # Get user info
+    user = User.query.get(openid)
+    if not user or not user.zone or not user.server_info:
+        return jsonify({'success': False, 'error': '请先设置赛区和服务器信息'})
+    
+    # Generate alliance ID: 10-character hash from zone + alliance_name
+    hash_input = f"{user.zone}{alliance_name}".encode('utf-8')
+    alliance_id = hashlib.md5(hash_input).hexdigest()[:10]
+    
+    # Check if alliance already exists
+    existing = Alliance.query.get(alliance_id)
+    if existing:
+        return jsonify({'success': False, 'error': '该同盟已存在'})
+    
+    # Create alliance
+    alliance = Alliance(
+        alliance_id=alliance_id,
+        alliance_name=alliance_name,
+        zone=user.zone,
+        server_info=user.server_info,
+        creator_openid=openid
+    )
+    
+    db.session.add(alliance)
+    
+    # Add creator as alliance member
+    member = AllianceMember(
+        alliance_id=alliance_id,
+        openid=openid
+    )
+    db.session.add(member)
+    
+    # Update user's alliance_name
+    user.alliance_name = alliance_name
+    
+    db.session.commit()
+    
+    return jsonify({
+        'success': True,
+        'alliance_id': alliance_id
+    })
+
+@alliance_bp.route('/api/alliance/join', methods=['POST'])
+def join_alliance():
+    data = request.json
+    openid = data.get('openid')
+    alliance_id = data.get('alliance_id', '').strip()
+    
+    if not openid or not alliance_id:
+        return jsonify({'success': False, 'error': '缺少必要参数'})
+    
+    # Get user info
+    user = User.query.get(openid)
+    if not user:
+        return jsonify({'success': False, 'error': '用户不存在'})
+    
+    # Check if user already has an alliance
+    if user.alliance_name:
+        return jsonify({'success': False, 'error': '您已加入其他同盟，请先退出'})
+    
+    # Check if alliance exists
+    alliance = Alliance.query.get(alliance_id)
+    if not alliance:
+        return jsonify({'success': False, 'error': '同盟ID不存在'})
+    
+    # Check if user's zone and server match the alliance
+    if user.zone != alliance.zone or user.server_info != alliance.server_info:
+        return jsonify({'success': False, 'error': '赛区或服务器不匹配，无法加入'})
+    
+    # Check if user is already a member
+    existing_member = AllianceMember.query.filter_by(
+        alliance_id=alliance_id,
+        openid=openid
+    ).first()
+    
+    if existing_member:
+        return jsonify({'success': False, 'error': '您已经是该同盟成员'})
+    
+    # Add user as alliance member
+    member = AllianceMember(
+        alliance_id=alliance_id,
+        openid=openid
+    )
+    db.session.add(member)
+    
+    # Update user's alliance_name
+    user.alliance_name = alliance.alliance_name
+    
+    db.session.commit()
+    
+    return jsonify({
+        'success': True,
+        'alliance_id': alliance_id,
+        'alliance_name': alliance.alliance_name
     })
 

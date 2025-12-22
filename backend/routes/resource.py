@@ -120,24 +120,24 @@ def recommend_relocation():
         return jsonify({'county': county, 'points': []})
 
     # 3. Heatmap Algorithm
-    # We want to find a coordinate (cx, cy) within distance 50 of (start_x, start_y)
+    # We want to find a coordinate (cx, cy) within distance 20 of (start_x, start_y)
     # that maximizes count of coppers within 5 (primary) and 20 (secondary).
     
     # Instead of scanning all pixels, we scan the area around each copper.
     # A copper at (cx, cy) contributes to the score of any candidate point within range 20.
     
-    # Candidate points must be within 50 of start.
+    # Candidate points must be within 20 of start.
     # We can use a dictionary to store scores for candidate points.
     # candidate_scores = { (x,y): {'score5': 0, 'score20': 0} }
     
     candidate_scores = {}
     
-    # Optimization: Only consider coppers that are within 50 + 20 = 70 of start.
-    # If a copper is further than 70, it cannot be within 20 of any point that is within 50 of start.
+    # Optimization: Only consider coppers that are within 20 + 20 = 40 of start.
+    # If a copper is further than 40, it cannot be within 20 of any point that is within 20 of start.
     relevant_coppers = []
     for c in coppers:
         dist_to_start = hex_distance(start_x, start_y, c.x, c.y)
-        if dist_to_start <= 70:
+        if dist_to_start <= 40:
             relevant_coppers.append(c)
             
     # Now, for each relevant copper, "splat" its influence onto the grid.
@@ -158,16 +158,16 @@ def recommend_relocation():
     # So we can just check points "near" the coppers?
     # Or just scan the 50-radius area around start?
     
-    # Let's scan the 50-radius area around start.
+    # Let's scan the 20-radius area around start.
     # To generate points in a hex grid within radius N is complex.
-    # Simple approach: Scan bounding box [start_x-50, start_x+50] x [start_y-50, start_y+50]
-    # Check hex distance <= 50.
+    # Simple approach: Scan bounding box [start_x-20, start_x+20] x [start_y-20, start_y+20]
+    # Check hex distance <= 20.
     
     candidates = []
     
     # Bounding box scan
-    for dx in range(-50, 51):
-        for dy in range(-50, 51):
+    for dx in range(-20, 21):
+        for dy in range(-20, 21):
             cx = start_x + dx
             cy = start_y + dy
             
@@ -175,7 +175,7 @@ def recommend_relocation():
             if not (0 <= cx <= 1500 and 0 <= cy <= 1500):
                 continue
                 
-            if hex_distance(start_x, start_y, cx, cy) <= 50:
+            if hex_distance(start_x, start_y, cx, cy) <= 20:
                 candidates.append((cx, cy))
                 
     # Calculate scores

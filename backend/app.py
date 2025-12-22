@@ -11,6 +11,7 @@ from routes.alliance import alliance_bp
 from routes.resource import resource_bp
 from routes.battle import battle_bp
 from routes.upload import upload_bp
+from routes.ocr import ocr_bp
 
 app = Flask(__name__)
 
@@ -37,6 +38,7 @@ app.register_blueprint(alliance_bp)
 app.register_blueprint(resource_bp)
 app.register_blueprint(battle_bp)
 app.register_blueprint(upload_bp)
+app.register_blueprint(ocr_bp)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

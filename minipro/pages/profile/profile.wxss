@@ -10,7 +10,6 @@
   width: 128rpx;
   height: 128rpx;
   margin: 20rpx;
-  border-radius: 50%;
 }
 
 .avatar-wrapper {
@@ -20,12 +19,34 @@
   border-radius: 50%;
   margin-bottom: 20px;
   background-color: #f0f0f0;
+  position: relative;
+}
+
+.avatar-wrapper::after {
+  border: none;
+}
+
+.avatar-wrapper.is-default {
+  border-radius: 0;
+  background-color: transparent;
 }
 
 .avatar {
   width: 128rpx;
   height: 128rpx;
   border-radius: 50%;
+}
+
+.avatar-wrapper.is-default .avatar {
+  border-radius: 0;
+}
+
+.edit-icon {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 40rpx;
+  height: 40rpx;
 }
 
 .nickname-input {
@@ -135,4 +156,21 @@
 
 .container {
   padding-top: 140rpx !important;
+}
+
+/* Highlight animation for OCR recognized fields */
+.highlight-anim {
+  animation: highlight-flash 2.2s ease-out;
+}
+
+@keyframes highlight-flash {
+  0%, 5% {
+    color: #ff0000;
+  }
+  10% {
+    color: #ff0000;
+  }
+  100% {
+    color: inherit;
+  }
 }

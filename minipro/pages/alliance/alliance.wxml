@@ -1,17 +1,40 @@
 <view class="container">
-  <view class="card">
-    <view class="title">上传同盟统计数据</view>
-    <view class="desc">上传最新同盟统计，系统会保存成员数据用于后续分析，一个账号只支持一个同盟。</view>
-    <button class="upload-btn" bindtap="chooseFile">选择文件 (CSV)</button>
-    <view class="note">文件名需包含导出时间（示例：同盟统计2025年01月25日13时30分12秒.csv）。</view>
+  <!-- Entry Selection Screen -->
+  <view class="entry-screen" wx:if="{{showEntry}}">
+    <view class="entry-title">同盟管理</view>
+    <view class="entry-options">
+      <view class="entry-card" bindtap="createAlliance">
+        <image class="entry-icon" src="/static/alliance/create.png" mode="aspectFit"></image>
+        <text class="entry-text">创建同盟</text>
+      </view>
+      <view class="entry-card" bindtap="joinAlliance">
+        <image class="entry-icon" src="/static/alliance/join.png" mode="aspectFit"></image>
+        <text class="entry-text">加入同盟</text>
+      </view>
+    </view>
   </view>
 
+  <!-- Alliance Creator View (full management) -->
+  <view wx:if="{{hasAlliance && isCreator}}">
+    <view class="card">
+      <view class="title-row">
+        <view class="title">上传同盟统计数据</view>
+        <view class="alliance-name-wrapper" bindtap="editAllianceName">
+          <text class="alliance-name">{{allianceName || '设置联盟名称'}}</text>
+          <text class="edit-icon">✎</text>
+        </view>
+      </view>
+      <view class="desc">上传最新同盟统计，系统会保存成员数据用于后续分析，一个账号只支持一个同盟。</view>
+      <button class="upload-btn" bindtap="chooseFile">选择文件 (CSV)</button>
+      <view class="note">文件名需包含导出时间（示例：同盟统计2025年01月25日13时30分12秒.csv）。</view>
+    </view>
+
   <view class="card" wx:if="{{uploads.length > 0}}">
-    <view class="section-header alliance-name-container">
+    <view class="section-header">
       <text class="section-title">我的同盟数据</text>
-      <view class="alliance-name-wrapper" bindtap="editAllianceName">
-        <text class="alliance-name">{{allianceName || '设置联盟名称'}}</text>
-        <text class="edit-icon">✎</text>
+      <view class="copy-id-btn" bindtap="copyAllianceId">
+        <text class="copy-text">复制同盟ID</text>
+        <image class="copy-icon" src="/static/alliance/copy.png" mode="aspectFit"></image>
       </view>
     </view>
     
@@ -31,9 +54,49 @@
           <view class="upload-detail-link" catchtap="viewDetail" data-id="{{item.id}}">
             <text>（成员数: {{item.member_count}}）</text>
           </view>
-          <view class="delete-btn" catchtap="deleteUpload" data-id="{{item.id}}">删除</view>
+          <view class="delete-btn" wx:if="{{isCreator}}" catchtap="deleteUpload" data-id="{{item.id}}">删除</view>
         </view>
       </block>
+    </view>
+  </view>
+  </view>
+
+  <!-- Alliance Member View (read-only, no upload permission) -->
+  <view wx:if="{{hasAlliance && !isCreator}}">
+    <view class="card" wx:if="{{uploads.length > 0}}">
+      <view class="section-header">
+        <text class="section-title">同盟数据</text>
+        <view class="copy-id-btn" bindtap="copyAllianceId">
+          <text class="copy-text">复制同盟ID</text>
+          <image class="copy-icon" src="/static/alliance/copy.png" mode="aspectFit"></image>
+        </view>
+      </view>
+      
+      <view class="analysis-actions">
+        <button class="analysis-btn {{canCompare ? '' : 'is-disabled'}}" bindtap="onAnalyze" data-type="battle">战功差值</button>
+        <button class="analysis-btn {{canCompare ? '' : 'is-disabled'}}" bindtap="onAnalyze" data-type="power">势力差值</button>
+        <button class="analysis-btn {{canCompare ? '' : 'is-disabled'}}" bindtap="onAnalyze" data-type="assist">攻城差值</button>
+        <button class="analysis-btn {{canCompare ? '' : 'is-disabled'}}" bindtap="onAnalyze" data-type="donation">罚款捐献</button>
+      </view>
+
+      <view class="uploads-list">
+        <block wx:for="{{uploads}}" wx:key="id">
+          <view class="upload-item {{item.selected ? 'is-selected' : ''}}">
+            <view class="upload-info" bindtap="toggleSelection" data-id="{{item.id}}">
+              <text class="upload-text">{{item.display_time}}</text>
+            </view>
+            <view class="upload-detail-link" catchtap="viewDetail" data-id="{{item.id}}">
+              <text>（成员数: {{item.member_count}}）</text>
+            </view>
+          </view>
+        </block>
+      </view>
+    </view>
+
+    <view class="card" wx:if="{{uploads.length === 0}}">
+      <view class="empty-state">
+        <text>同盟还没有上传数据</text>
+      </view>
     </view>
   </view>
 </view>

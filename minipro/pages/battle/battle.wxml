@@ -1,31 +1,33 @@
 <view class="container">
   <view class="header">
     <text class="title">战功识别</text>
-    <text class="subtitle">上传截图自动识别战功数值</text>
+    <text class="subtitle">请分别上传连串战报和单场战报</text>
   </view>
 
-  <view class="image-grid">
-    <view class="image-item" wx:for="{{images}}" wx:key="tempFilePath">
-      <image class="thumb" src="{{item.tempFilePath}}" mode="aspectFill" bindtap="previewImage" data-url="{{item.tempFilePath}}"></image>
-      
-      <!-- Delete Button -->
-      <view class="delete-btn" catchtap="deleteImage" data-index="{{index}}">×</view>
-      
-      <!-- Status/Result Overlay -->
-      <view class="overlay {{item.status}}">
-        <block wx:if="{{item.status === 'pending'}}">待识别</block>
-        <block wx:elif="{{item.status === 'uploading'}}">识别中...</block>
-        <block wx:elif="{{item.status === 'success'}}">
-          <text class="result-num">+{{item.result}}</text>
-        </block>
-        <block wx:elif="{{item.status === 'fail'}}">失败</block>
+  <view class="upload-section">
+    <!-- Image 1: Consecutive Battle Report -->
+    <view class="upload-item" bindtap="chooseImage" data-type="consecutive">
+      <view class="label">连串战报</view>
+      <view class="image-box">
+        <image wx:if="{{consecutiveImage}}" src="{{consecutiveImage}}" mode="aspectFit" class="preview"></image>
+        <view wx:else class="placeholder">+</view>
       </view>
     </view>
 
-    <!-- Add Button -->
-    <view class="add-btn" bindtap="chooseImages">
-      <text class="plus">+</text>
-      <text class="add-text">添加图片</text>
+    <!-- Image 2: Single Battle Report -->
+    <view class="upload-item" bindtap="chooseImage" data-type="single">
+      <view class="label">单场战报</view>
+      <view class="image-box">
+        <image wx:if="{{singleImage}}" src="{{singleImage}}" mode="aspectFit" class="preview"></image>
+        <view wx:else class="placeholder">+</view>
+      </view>
     </view>
+  </view>
+
+  <button class="submit-btn" type="primary" bindtap="startRecognition">开始识别</button>
+  
+  <view class="debug-info" wx:if="{{debugLog}}">
+    <text>调试信息 (请查看 Console):</text>
+    <text>{{debugLog}}</text>
   </view>
 </view>

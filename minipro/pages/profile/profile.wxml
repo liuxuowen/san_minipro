@@ -6,8 +6,9 @@
 
   <view class="userinfo">
     <!-- 始终允许点击头像进行修改 -->
-    <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+    <button class="avatar-wrapper {{(!userInfo.avatarUrl || userInfo.avatarUrl === defaultAvatarUrl) ? 'is-default' : ''}}" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
       <image class="avatar" src="{{userInfo.avatarUrl || defaultAvatarUrl}}" mode="cover"></image>
+      <image wx:if="{{!userInfo.avatarUrl || userInfo.avatarUrl === defaultAvatarUrl}}" class="edit-icon" src="/static/profile/edit.png" mode="aspectFit"></image>
     </button> 
     
     <!-- 始终显示输入框，允许用户随时修改昵称 -->
@@ -31,25 +32,25 @@
     </view>
     <view class="info-item">
       <text class="label">角色名称</text>
-      <input class="input-value" placeholder="请输入角色名称" value="{{userInfo.roleName}}" data-field="roleName" bindinput="onOcrFieldInput" bindblur="saveOcrInfo"/>
+      <input class="input-value {{highlightFields.roleName ? 'highlight-anim' : ''}}" placeholder="请输入角色名称" value="{{userInfo.roleName}}" data-field="roleName" bindinput="onOcrFieldInput" bindblur="saveOcrInfo"/>
     </view>
 
     <!-- 不可编辑部分 -->
     <view class="info-item">
       <text class="label">角色编号</text>
-      <input class="input-value disabled-input num-font" placeholder="未识别" value="{{userInfo.roleId}}" data-field="roleId" bindinput="onOcrFieldInput" bindblur="saveOcrInfo" disabled="true"/>
+      <input class="input-value disabled-input num-font {{highlightFields.roleId ? 'highlight-anim' : ''}}" placeholder="未识别" value="{{userInfo.roleId}}" data-field="roleId" bindinput="onOcrFieldInput" bindblur="saveOcrInfo" disabled="true"/>
     </view>
     <view class="info-item">
       <text class="label">服务器</text>
-      <input class="input-value disabled-input num-font" placeholder="未识别" value="{{userInfo.serverInfo}}" data-field="serverInfo" bindinput="onOcrFieldInput" bindblur="saveOcrInfo" disabled="true"/>
+      <input class="input-value disabled-input num-font {{highlightFields.serverInfo ? 'highlight-anim' : ''}}" placeholder="未识别" value="{{userInfo.serverInfo}}" data-field="serverInfo" bindinput="onOcrFieldInput" bindblur="saveOcrInfo" disabled="true"/>
     </view>
     <view class="info-item">
       <text class="label">赛区</text>
-      <input class="input-value disabled-input num-font" placeholder="未识别" value="{{userInfo.zone}}" data-field="zone" bindinput="onOcrFieldInput" bindblur="saveOcrInfo" disabled="true"/>
+      <input class="input-value disabled-input num-font {{highlightFields.zone ? 'highlight-anim' : ''}}" placeholder="未识别" value="{{userInfo.zone}}" data-field="zone" bindinput="onOcrFieldInput" bindblur="saveOcrInfo" disabled="true"/>
     </view>
     <view class="info-item">
       <text class="label">队伍</text>
-      <input class="input-value disabled-input num-font" placeholder="未识别" value="{{userInfo.teamName}}" data-field="teamName" bindinput="onOcrFieldInput" bindblur="saveOcrInfo" disabled="true"/>
+      <input class="input-value disabled-input num-font {{highlightFields.teamName ? 'highlight-anim' : ''}}" placeholder="未识别" value="{{userInfo.teamName}}" data-field="teamName" bindinput="onOcrFieldInput" bindblur="saveOcrInfo" disabled="true"/>
     </view>
   </view>
 
